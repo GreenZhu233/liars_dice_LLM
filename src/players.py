@@ -31,10 +31,11 @@ class Player():
             return True
         return False
 
-    def get_ai_action(self, round_base_info: str, round_action_info: str, extra_hint: str = ""):
+    def get_ai_action(self, is_first: bool, round_base_info: str, round_action_info: str, extra_hint: str = ""):
         """
         获取AI玩家的动作
         Args:
+            is_first: bool, 是否为本轮的第一个玩家（第一个玩家不能质疑）。
             round_base_info: 本轮的基本信息，包含玩家数量、玩家名称、玩家顺序和毒药数量等。
             round_action_info: 本轮游戏中已经发生的动作记录。
             extra_hint: 额外提示信息。
