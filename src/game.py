@@ -168,3 +168,14 @@ class LiarsDiceGame():
         winner = self.active_players[0]
         self.logger.info(f"游戏结束，{winner.name} 获胜！")
         return winner.name
+
+if __name__ == "__main__":
+    # 示例
+    players = [
+        Player(name="Alice", is_human=False, model = "deepseek-chat"),
+        Player(name="Bob", is_human=False, model = "deepseek-chat"),
+        Player(name="Charlie", is_human=False, model = "deepseek-chat"),
+        Player(name="David", is_human=False, model = "deepseek-chat")
+    ]
+    game = LiarsDiceGame(players)
+    winner = game.start_game()
