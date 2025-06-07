@@ -60,25 +60,25 @@ class LiarsDiceGame():
         self.logger.info(log_msg)
 
         # 计算骰子总数
-        total_dice = sum(player.count_dice(action['value']) for player in self.active_players)
+        total_dice = sum(player.count_dice(self.dice_value) for player in self.active_players)
 
         # 获取上家和下家
         previous_player = self.active_players[(self.current_player_index - 1)]
         next_player = self.active_players[(self.current_player_index + 1) % len(self.active_players)]
 
         # 比较赌注和实际骰子数量
-        if action['number'] > total_dice:
+        if self.dice_number > total_dice:
             # 质疑成功
             previous_player.drink_poison()
             self.round_action_info += f"{player.name} 质疑成功！{previous_player.name} 喝了一瓶毒药。\n"
             self.logger.info(f"{player.name} 质疑成功！{previous_player.name} 喝了一瓶毒药。")
             # 判断上家是否死亡
             if previous_player.is_alive():
-                self.current_player_index = self.active_players.index(previous_player)      # 败者成为下一轮的第一个玩家
+                self.first_player = previous_player  # 败者成为下一轮的第一个玩家
             else:
                 self.logger.info(f"{previous_player.name} 已经死亡。")
                 self.active_players.remove(previous_player)
-                self.current_player_index = self.active_players.index(next_player)      # 质疑者下家成为下一轮的第一个玩家
+                self.first_player = next_player      # 质疑者下家成为下一轮的第一个玩家
         else:
             # 质疑失败
             player.drink_poison()
@@ -86,11 +86,11 @@ class LiarsDiceGame():
             self.logger.info(f"{player.name} 质疑失败！{player.name} 喝了一瓶毒药。")
             # 判断质疑者是否死亡
             if player.is_alive():
-                self.current_player_index = self.active_players.index(player)       # 败者成为下一轮的第一个玩家
+                self.first_player = player      # 败者成为下一轮的第一个玩家
             else:
                 self.logger.info(f"{player.name} 已经死亡。")
                 self.active_players.remove(player)
-                self.current_player_index = self.active_players.index(next_player)  # 质疑者下家成为下一轮的第一个玩家
+                self.first_player = next_player     # 质疑者下家成为下一轮的第一个玩家
 
     def start_round(self):
         """开始一轮游戏"""
