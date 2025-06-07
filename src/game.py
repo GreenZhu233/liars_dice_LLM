@@ -18,14 +18,13 @@ class LiarsDiceGame():
         self.round_base_info = ""
         self.round_action_info = ""
         self.extra_hint = ""
-        self.somebody_died = False
 
     def create_logger(self):
         """创建日志记录器"""
         os.makedirs('logs', exist_ok=True)
         logger = logging.getLogger(__name__)
         logger.setLevel(logging.INFO)
-        file_handler = logging.FileHandler(f"logs/game_log_{time.strftime("%Y%m%d_%H%M%S")}.log")
+        file_handler = logging.FileHandler(f"logs/game_log_{time.strftime('%Y%m%d_%H%M%S')}.log", encoding="utf-8")
         stream_handler = logging.StreamHandler()
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
         file_handler.setFormatter(formatter)
@@ -78,7 +77,6 @@ class LiarsDiceGame():
                 self.current_player_index = self.active_players.index(previous_player)      # 败者成为下一轮的第一个玩家
             else:
                 self.logger.info(f"{previous_player.name} 已经死亡。")
-                self.somebody_died = True
                 self.active_players.remove(previous_player)
                 self.current_player_index = self.active_players.index(next_player)      # 质疑者下家成为下一轮的第一个玩家
         else:
@@ -91,7 +89,6 @@ class LiarsDiceGame():
                 self.current_player_index = self.active_players.index(player)       # 败者成为下一轮的第一个玩家
             else:
                 self.logger.info(f"{player.name} 已经死亡。")
-                self.somebody_died = True
                 self.active_players.remove(player)
                 self.current_player_index = self.active_players.index(next_player)  # 质疑者下家成为下一轮的第一个玩家
 
@@ -147,16 +144,12 @@ class LiarsDiceGame():
                 self.logger.info(f"{player.name} 思考：{reasoning}")
             if action['challenge']:
                 self.handle_challenge(player, action)
+                break
             else:
                 if self.handle_bid(player, action):
                     is_first = False
                 else:
                     error_times += 1
-
-            # 检查是否有玩家死亡
-            if self.somebody_died:
-                self.somebody_died = False
-                break
 
     def start_game(self) -> str:
         """开始游戏"""
