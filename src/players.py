@@ -16,7 +16,7 @@ class Player():
 
     def roll_dice(self, count):
         self.dice = [random.randint(1, 6) for _ in range(count)]
-        return self.dice
+        return self.dice.sort()
 
     def count_dice(self, value):
         return self.dice.count(value)
