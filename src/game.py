@@ -24,7 +24,7 @@ class LiarsDiceGame():
         os.makedirs('logs', exist_ok=True)
         logger = logging.getLogger(__name__)
         logger.setLevel(logging.INFO)
-        file_handler = logging.FileHandler(f"logs/game_log_{time.strftime("%Y%m%d_%H%M%S")}.log")
+        file_handler = logging.FileHandler(f"logs/game_log_{time.strftime('%Y%m%d_%H%M%S')}.log", encoding="utf-8")
         stream_handler = logging.StreamHandler()
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
         file_handler.setFormatter(formatter)
