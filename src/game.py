@@ -18,6 +18,7 @@ class LiarsDiceGame():
         self.round_base_info = ""
         self.round_action_info = ""
         self.extra_hint = ""
+        self.somebody_died = False
 
     def create_logger(self):
         """创建日志记录器"""
@@ -77,6 +78,7 @@ class LiarsDiceGame():
                 self.current_player_index = self.active_players.index(previous_player)      # 败者成为下一轮的第一个玩家
             else:
                 self.logger.info(f"{previous_player.name} 已经死亡。")
+                self.somebody_died = True
                 self.active_players.remove(previous_player)
                 self.current_player_index = self.active_players.index(next_player)      # 质疑者下家成为下一轮的第一个玩家
         else:
@@ -89,6 +91,7 @@ class LiarsDiceGame():
                 self.current_player_index = self.active_players.index(player)       # 败者成为下一轮的第一个玩家
             else:
                 self.logger.info(f"{player.name} 已经死亡。")
+                self.somebody_died = True
                 self.active_players.remove(player)
                 self.current_player_index = self.active_players.index(next_player)  # 质疑者下家成为下一轮的第一个玩家
 
@@ -100,6 +103,7 @@ class LiarsDiceGame():
             self.round_base_info += f"{player.name}: {player.poison}瓶\n"
         self.round_base_info += f"本轮从{self.first_player.name}开始\n"
         self.round_action_info = ""
+        self.extra_hint = ""
 
         # 重置当前的赌注
         self.dice_value = 0
@@ -144,10 +148,15 @@ class LiarsDiceGame():
             if action['challenge']:
                 self.handle_challenge(player, action)
             else:
-                if not self.handle_bid(player, action):
+                if self.handle_bid(player, action):
+                    is_first = False
+                else:
                     error_times += 1
 
-            is_first = False
+            # 检查是否有玩家死亡
+            if self.somebody_died:
+                self.somebody_died = False
+                break
 
     def start_game(self) -> str:
         """开始游戏"""
