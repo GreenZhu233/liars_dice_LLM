@@ -6,6 +6,7 @@
 你是该轮第一个决策的玩家。
 你的骰子点数是：{dices}
 你可以任意叫点。
+{extra_hint}
 
 你需要输出一个完整的json结构，包含以下键值对：
 "challenge": bool, 只能为false
