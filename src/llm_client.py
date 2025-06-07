@@ -14,7 +14,7 @@ class OpenAILLMClient:
             case "deepseek-reasoner":
                 api_key = config.get("DEEPSEEK_API_KEY")
                 base_url = "https://api.deepseek.com"
-            case "doubao":
+            case "doubao-1-5-lite-32k-250115":
                 api_key = config.get("DOUBAO_API_KEY")
                 base_url = "https://ark.cn-beijing.volces.com/api/v3"
             case _:
@@ -46,7 +46,6 @@ class OpenAILLMClient:
                 message = response.choices[0].message
                 content = message.content if message.content else ""
                 reasoning_content = getattr(message, "reasoning_content", "")
-                print(f"LLM推理内容: {content}")
                 return content, reasoning_content
             
             return "", ""

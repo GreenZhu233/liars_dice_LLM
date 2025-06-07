@@ -73,7 +73,7 @@ class Player():
         first_template = self._read_file(FIRST_PLAYER_ACTION_PROMPT_TEMPLATE_PATH)
 
         # 准备当前手牌信息
-        current_dice = ", ".join(self.dice)
+        current_dice = ", ".join([str(dice) for dice in self.dice])
 
         # 填充模板
         if is_first:
