@@ -1,3 +1,4 @@
+你的名字是：{player_name}
 以下是当局游戏的情况：
 {round_base_info}
 {round_action_info}
