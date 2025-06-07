@@ -60,7 +60,7 @@ class LiarsDiceGame():
         self.logger.info(log_msg)
 
         # 计算骰子总数
-        total_dice = sum(player.count_dice(self.dice_value) for player in self.active_players)
+        total_dice = sum(player.count_dice(action['value']) for player in self.active_players)
 
         # 获取上家和下家
         previous_player = self.active_players[(self.current_player_index - 1)]
