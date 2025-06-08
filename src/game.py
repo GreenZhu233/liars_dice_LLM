@@ -1,4 +1,4 @@
-from players import Player
+from src.players import Player
 import logging
 import time
 import random
@@ -8,16 +8,30 @@ from typing import List, Dict, Any
 class LiarsDiceGame():
     def __init__(self, players: List[Player]):
         self.players = players
-        self.logger = self.create_logger()
+        self.human_player = None
+        for player in players:
+            if player.is_human:
+                self.human_player = player
+                break
         self.round = 0
         self.active_players = []
         self.first_player = self.players[random.randint(0, len(self.players) - 1)]  # 随机选择第一个玩家
         self.current_player_index = 0
+        self.gui = None  # GUI引用
+        self.logger = self.create_logger()
 
         # 轮次信息
         self.round_base_info = ""
         self.round_action_info = ""
         self.extra_hint = ""
+
+    def set_gui(self, gui):
+        """设置GUI引用"""
+        self.gui = gui
+        # 为人类玩家设置GUI引用
+        for player in self.players:
+            if player.is_human:
+                player.gui = gui
 
     def create_logger(self):
         """创建日志记录器"""
@@ -25,19 +39,28 @@ class LiarsDiceGame():
         logger = logging.getLogger(__name__)
         logger.setLevel(logging.INFO)
         file_handler = logging.FileHandler(f"logs/game_log_{time.strftime('%Y%m%d_%H%M%S')}.log", encoding="utf-8")
-        stream_handler = logging.StreamHandler()
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
         file_handler.setFormatter(formatter)
-        stream_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
+        stream_handler = logging.StreamHandler()
+        stream_handler.setFormatter(formatter)
         logger.addHandler(stream_handler)
         return logger
+
+    def log_to_gui(self, message):
+        """向GUI发送日志消息"""
+        if self.gui:
+            self.gui.root.after(0, lambda: self.gui.log_message(message))
 
     def handle_bid(self, player: Player, action: Dict[str, Any]) -> bool:
         """处理玩家的叫点行为"""
         # 打印日志
         log_msg = f"{player.name} 叫点：{action['number']}个{action['value']}点。\n理由：{action['reason']}\n行为：{action['behaviour']}"
         self.logger.info(log_msg)
+        self.log_to_gui(f"🎲 {player.name} 叫点：{action['number']}个{action['value']}点")
+        if self.gui.game_mode.get() == "ai_only":
+            self.log_to_gui(f"💭 理由：{action['reason']}")
+        self.log_to_gui(f"🎭 {action['behaviour']}")
 
         # 判断合法性
         if action['number'] > self.dice_number or (action['number'] == self.dice_number and action['value'] > self.dice_value):
@@ -50,6 +73,7 @@ class LiarsDiceGame():
             return True
         else:
             self.logger.error(f"{player.name} 叫点不合法。")
+            self.log_to_gui(f"❌ {player.name} 叫点不合法！")
             self.extra_hint = f"你的赌注要么数量大于{self.dice_number}，要么数量等于{self.dice_number}但点数大于{self.dice_value}。"
             return False
 
@@ -58,9 +82,20 @@ class LiarsDiceGame():
         # 打印日志
         log_msg = f"{player.name} 质疑上家。\n理由：{action['reason']}\n行为：{action['behaviour']}"
         self.logger.info(log_msg)
+        self.log_to_gui(f"⚔️ {player.name} 质疑上家！")
+        if self.gui.game_mode.get() == "ai_only":
+            self.log_to_gui(f"💭 理由：{action['reason']}")
+        self.log_to_gui(f"🎭 {action['behaviour']}")
 
         # 计算骰子总数
         total_dice = sum(player.count_dice(self.dice_value) for player in self.active_players)
+
+        # 显示所有玩家的骰子（用于验证）
+        dice_info = "🎲 验证结果 - 所有玩家的骰子："
+        for p in self.active_players:
+            dice_info += f"\n{p.name}: {p.dice} (有{p.count_dice(self.dice_value)}个{self.dice_value}点)"
+        dice_info += f"\n总共有 {total_dice} 个 {self.dice_value} 点，赌注是 {self.dice_number} 个"
+        self.log_to_gui(dice_info)
 
         # 获取上家和下家
         previous_player = self.active_players[(self.current_player_index - 1)]
@@ -70,27 +105,43 @@ class LiarsDiceGame():
         if self.dice_number > total_dice:
             # 质疑成功
             previous_player.drink_poison()
-            self.round_action_info += f"{player.name} 质疑成功！{previous_player.name} 喝了一瓶毒药。\n"
-            self.logger.info(f"{player.name} 质疑成功！{previous_player.name} 喝了一瓶毒药。")
+            result_msg = f"✅ {player.name} 质疑成功！{previous_player.name} 喝了一瓶毒药。"
+            self.round_action_info += result_msg + "\n"
+            self.logger.info(result_msg)
+            self.log_to_gui(result_msg)
+            
             # 判断上家是否死亡
             if previous_player.is_alive():
                 self.first_player = previous_player  # 败者成为下一轮的第一个玩家
+                self.log_to_gui(f"💊 {previous_player.name} 还剩 {previous_player.poison} 瓶毒药")
             else:
-                self.logger.info(f"{previous_player.name} 已经死亡。")
+                death_msg = f"💀 {previous_player.name} 已经死亡。"
+                self.logger.info(death_msg)
+                self.log_to_gui(death_msg)
                 self.active_players.remove(previous_player)
                 self.first_player = next_player      # 质疑者下家成为下一轮的第一个玩家
         else:
             # 质疑失败
             player.drink_poison()
-            self.round_action_info += f"{player.name} 质疑失败！{player.name} 喝了一瓶毒药。\n"
-            self.logger.info(f"{player.name} 质疑失败！{player.name} 喝了一瓶毒药。")
+            result_msg = f"❌ {player.name} 质疑失败！{player.name} 喝了一瓶毒药。"
+            self.round_action_info += result_msg + "\n"
+            self.logger.info(result_msg)
+            self.log_to_gui(result_msg)
+            
             # 判断质疑者是否死亡
             if player.is_alive():
                 self.first_player = player      # 败者成为下一轮的第一个玩家
+                self.log_to_gui(f"💊 {player.name} 还剩 {player.poison} 瓶毒药")
             else:
-                self.logger.info(f"{player.name} 已经死亡。")
+                death_msg = f"💀 {player.name} 已经死亡。"
+                self.logger.info(death_msg)
+                self.log_to_gui(death_msg)
                 self.active_players.remove(player)
                 self.first_player = next_player     # 质疑者下家成为下一轮的第一个玩家
+
+        # 更新GUI玩家信息
+        if self.gui:
+            self.gui.root.after(0, lambda: self.gui.update_players_info(self.active_players))
 
     def start_round(self):
         """开始一轮游戏"""
@@ -102,6 +153,12 @@ class LiarsDiceGame():
         self.round_action_info = ""
         self.extra_hint = ""
 
+        # GUI显示轮次信息
+        round_msg = f"🚀 第{self.round}轮开始！从 {self.first_player.name} 开始"
+        self.log_to_gui("=" * 50)
+        self.log_to_gui(round_msg)
+        self.log_to_gui("=" * 50)
+
         # 重置当前的赌注
         self.dice_value = 0
         self.dice_number = 0
@@ -109,6 +166,8 @@ class LiarsDiceGame():
         # 摇盅
         for player in self.active_players:
             player.roll_dice(5)
+        if self.gui and self.human_player:
+            self.gui.update_dice_display(self.human_player.dice)
 
         # 日志
         log_msg = f"第{self.round}轮开始\n"
@@ -116,11 +175,16 @@ class LiarsDiceGame():
             log_msg += f"玩家：{player.name} 骰子：{player.dice} 毒药: {player.poison}瓶\n"
         self.logger.info(log_msg)
 
+        # 更新GUI玩家信息
+        if self.gui:
+            self.gui.root.after(0, lambda: self.gui.update_players_info(self.active_players))
+
         # 玩家开始行动
         self.current_player_index = self.active_players.index(self.first_player)
         is_first = True
         error_times = 0
         self.logger.info(f"本轮从{self.first_player.name}开始")
+        
         while(1):
             if error_times >= 2:
                 self.logger.error("连续两次错误，退出程序。")
@@ -128,6 +192,11 @@ class LiarsDiceGame():
 
             # 获取玩家行动
             player = self.active_players[self.current_player_index]
+            
+            # 等待一下，让界面更新
+            if self.gui:
+                time.sleep(0.5)
+            
             if not player.is_human:
                 action, reasoning = player.get_ai_action(
                     is_first=is_first,
@@ -135,6 +204,9 @@ class LiarsDiceGame():
                     round_action_info=self.round_action_info,
                     extra_hint=self.extra_hint
                 )
+                # 显示AI思考过程
+                if reasoning:
+                    self.log_to_gui(f"🤔 {player.name} 思考：{reasoning}")
             else:
                 action = player.get_human_action()
                 reasoning = ""
@@ -151,15 +223,30 @@ class LiarsDiceGame():
             else:
                 if self.handle_bid(player, action):
                     is_first = False
+                    # 如果还有下一个玩家，显示提示
+                    next_player = self.active_players[self.current_player_index]
+                    if not next_player.is_human:
+                        self.log_to_gui(f"⏳ 等待 {next_player.name} 行动...")
                 else:
                     error_times += 1
 
     def start_game(self) -> str:
         """开始游戏"""
         self.logger.info("游戏开始")
+        self.log_to_gui("🎮 欢迎来到谎言骰子游戏！")
+        self.log_to_gui("📋 游戏规则：每人有5个骰子和2瓶毒药，轮流叫点或质疑，败者喝毒药")
+
         self.active_players = self.players.copy()
+
+        # 显示初始玩家信息
+        if self.gui:
+            self.gui.root.after(0, lambda: self.gui.update_players_info(self.active_players))
+
         while len(self.active_players) > 1:
             self.start_round()
+            if len(self.active_players) > 1:
+                self.log_to_gui(f"📊 本轮结束，还有 {len(self.active_players)} 名玩家存活")
+                time.sleep(1)  # 给玩家一些时间观察结果
 
         winner = self.active_players[0]
         self.logger.info(f"游戏结束，{winner.name} 获胜！")
