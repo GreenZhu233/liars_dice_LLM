@@ -2,6 +2,7 @@ import random
 import re
 import json
 from llm_client import OpenAILLMClient
+from typing import List, Dict, Any
 
 RULE_PATH = "template/rule.txt"
 ACTION_PROMPT_TEMPLATE_PATH = "template/action_prompt_template.txt"
@@ -48,7 +49,7 @@ class Player():
             print(f"读取文件 {filepath} 失败: {str(e)}")
             return ""
 
-    def get_ai_action(self, is_first: bool, round_base_info: str, round_action_info: str, extra_hint: str = ""):
+    def get_ai_action(self, is_first: bool, round_base_info: str, round_action_info: str, extra_hint: str = "") -> tuple[Dict[str, Any], str]:
         """
         获取AI玩家的动作
         Args:
@@ -98,19 +99,20 @@ class Player():
             # 每次都发送相同的原始prompt
             messages = [{"role": "system", "content": rules},
             {"role": "user", "content": prompt}]
-            
+
             try:
-                content, reasoning_content = self.llm_client.chat(messages)
-                
-                # 尝试从内容中提取JSON部分
-                json_match = re.search(r'({[\s\S]*})', content)
-                if json_match:
-                    json_str = json_match.group(1)
-                    result = json.loads(json_str)
-                    
-                    # 验证JSON格式是否符合要求
-                    if all(key in result for key in ["challenge", "value", "number", "reason", "behaviour"]):   
-                        return result, reasoning_content               
+                if self.llm_client:
+                    content, reasoning_content = self.llm_client.chat(messages)
+
+                    # 尝试从内容中提取JSON部分
+                    json_match = re.search(r'({[\s\S]*})', content)
+                    if json_match:
+                        json_str = json_match.group(1)
+                        result = json.loads(json_str)
+
+                        # 验证JSON格式是否符合要求
+                        if all(key in result for key in ["challenge", "value", "number", "reason", "behaviour"]):
+                            return result, reasoning_content
             except Exception as e:
                 # 仅记录错误，不修改重试请求
                 print(f"尝试 {attempt+1} 解析失败: {str(e)}")
