@@ -142,6 +142,9 @@ class LiarsDiceGame():
             # 分析处理玩家行动
             if reasoning:
                 self.logger.info(f"{player.name} 思考：{reasoning}")
+            if not action:
+                self.logger.error(f"{player.name} 行动为空。")
+                raise ValueError(f"{player.name} 行动为空。")
             if action['challenge']:
                 self.handle_challenge(player, action)
                 break
