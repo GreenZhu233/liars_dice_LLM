@@ -70,6 +70,8 @@ class LiarsDiceGame():
             self.round_action_info += f"{player.name} 叫点：{action['number']}个{action['value']}点。\n"
             self.extra_hint = ""
             self.current_player_index = (self.current_player_index + 1) % len(self.active_players)      # 切换下一个玩家行动
+            if self.gui:
+                self.gui.update_bid_display(action['number'], action['value'])
             return True
         else:
             self.logger.error(f"{player.name} 叫点不合法。")

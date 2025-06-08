@@ -22,6 +22,14 @@ class LiarsDiceGUI:
         self.human_action_event = None
         self.human_action_result = None
 
+        # 默认角色配置
+        self.role_config = [
+            {"name": "Alice", "model": "deepseek-chat"},
+            {"name": "Bob", "model": "deepseek-chat"},
+            {"name": "Charlie", "model": "deepseek-chat"},
+            {"name": "David", "model": "deepseek-chat"}
+        ]
+
         # 创建主界面
         self.create_main_interface()
 
@@ -89,6 +97,21 @@ class LiarsDiceGUI:
         )
         api_button.pack(pady=20)
 
+        # 角色设置按钮
+        role_button = tk.Button(
+            self.root,
+            text="角色设置",
+            command=self.show_role_settings,
+            font=("Arial", 12),
+            bg="#9b59b6",
+            fg="white",
+            padx=20,
+            pady=10,
+            relief="flat",
+            cursor="hand2"
+        )
+        role_button.pack(pady=10)
+
         # 开始游戏按钮
         start_button = tk.Button(
             self.root,
@@ -113,7 +136,7 @@ class LiarsDiceGUI:
         api_window.grab_set()  # 模态窗口
 
         # 读取现有配置
-        config = self.load_config()
+        config = self.load_api_config()
 
         tk.Label(
             api_window,
@@ -212,8 +235,126 @@ class LiarsDiceGUI:
             cursor="hand2"
         ).pack(side="left", padx=10)
 
-    def load_config(self):
-        """加载配置文件"""
+    def show_role_settings(self):
+        """显示角色设置窗口"""
+        role_window = tk.Toplevel(self.root)
+        role_window.title("角色设置")
+        role_window.geometry("650x600")
+        role_window.configure(bg="#2c3e50")
+        role_window.grab_set()
+
+        tk.Label(
+            role_window,
+            text="角色配置",
+            font=("Arial", 16, "bold"),
+            fg="#ecf0f1",
+            bg="#2c3e50"
+        ).pack(pady=20)
+
+        # 创建滚动框架
+        canvas = tk.Canvas(role_window, bg="#2c3e50")
+        scrollbar = ttk.Scrollbar(role_window, orient="vertical", command=canvas.yview)
+        scrollable_frame = tk.Frame(canvas, bg="#2c3e50")
+
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        # 角色设置区域
+        role_entries = []
+
+        for i, role in enumerate(self.role_config):
+            frame = tk.Frame(scrollable_frame, bg="#34495e", relief="solid", bd=1)
+            frame.pack(fill="x", padx=20, pady=10)
+
+            tk.Label(
+                frame,
+                text=f"玩家 {i+1}:(AI)" if i > 0 else "玩家 1:(AI或人类玩家)",
+                font=("Arial", 12, "bold"),
+                fg="#ecf0f1",
+                bg="#34495e"
+            ).grid(row=0, column=0, columnspan=2, pady=5, sticky="w")
+
+            # 玩家名字
+            tk.Label(frame, text="名字:", font=("Arial", 10), fg="#ecf0f1", bg="#34495e").grid(row=2, column=0, sticky="w", padx=5)
+            name_var = tk.StringVar(value=role["name"])
+            name_entry = tk.Entry(frame, textvariable=name_var, width=15)
+            name_entry.grid(row=2, column=1, padx=5, pady=2)
+
+            # AI模型
+            tk.Label(frame, text="AI模型:", font=("Arial", 10), fg="#ecf0f1", bg="#34495e").grid(row=3, column=0, sticky="w", padx=5)
+            model_var = tk.StringVar(value=role["model"])
+            model_combo = ttk.Combobox(
+                frame,
+                textvariable=model_var,
+                values=["deepseek-chat", "deepseek-reasoner", "doubao-1-5-lite-32k-250115"],
+                state="readonly",
+                width=20
+            )
+            model_combo.grid(row=3, column=1, padx=5, pady=2)
+
+            role_entries.append({
+                "name": name_var,
+                "model": model_var
+            })
+
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
+        # 按钮框架
+        button_frame = tk.Frame(role_window, bg="#2c3e50")
+        button_frame.pack(pady=20)
+
+        def save_roles():
+            try:
+                new_config = []
+
+                for entry in role_entries:
+
+                    new_config.append({
+                        "name": entry["name"].get().strip() or f"Player{len(new_config)+1}",
+                        "model": entry["model"].get(),
+                    })
+
+                self.role_config = new_config
+                messagebox.showinfo("成功", "角色配置保存成功！")
+                role_window.destroy()
+
+            except Exception as e:
+                messagebox.showerror("错误", f"保存失败：{str(e)}")
+
+        tk.Button(
+            button_frame,
+            text="保存配置",
+            command=save_roles,
+            font=("Arial", 12),
+            bg="#27ae60",
+            fg="white",
+            padx=20,
+            pady=8,
+            relief="flat",
+            cursor="hand2"
+        ).pack(side="left", padx=10)
+
+        tk.Button(
+            button_frame,
+            text="取消",
+            command=role_window.destroy,
+            font=("Arial", 12),
+            bg="#e74c3c",
+            fg="white",
+            padx=20,
+            pady=8,
+            relief="flat",
+            cursor="hand2"
+        ).pack(side="left", padx=10)
+
+    def load_api_config(self):
+        """加载API配置文件"""
         try:
             with open("config/keys.json", "r", encoding="utf-8") as f:
                 return json.load(f)
@@ -223,7 +364,7 @@ class LiarsDiceGUI:
     def start_game(self):
         """开始游戏"""
         # 检查API keys
-        config = self.load_config()
+        config = self.load_api_config()
         if not config.get("DEEPSEEK_API_KEY"):
             messagebox.showerror("错误", "请先设置DeepSeek API Key！")
             return
@@ -231,25 +372,22 @@ class LiarsDiceGUI:
         # 创建游戏界面
         self.create_game_interface()
 
-        # 创建玩家
+        # 根据角色配置创建玩家
+        players = []
         if self.game_mode.get() == "ai_only":
-            players = [
-                Player(name="Alice", is_human=False, model="deepseek-chat"),
-                Player(name="Bob", is_human=False, model="deepseek-chat"),
-                Player(name="Charlie", is_human=False, model="deepseek-chat"),
-                Player(name="David", is_human=False, model="deepseek-chat")
-            ]
+            for role in self.role_config:
+                players.append(Player(name=role["name"], is_human=False, model=role["model"]))
         else:
-            players = [
-                Player(name="Alice", is_human=True, model=""),
-                Player(name="Bob", is_human=False, model="deepseek-chat"),
-                Player(name="Charlie", is_human=False, model="deepseek-chat"),
-                Player(name="David", is_human=False, model="deepseek-chat")
-            ]
+            for i, role in enumerate(self.role_config):
+                players.append(Player(
+                    name=role["name"],
+                    is_human=False if i > 0 else True,
+                    model=role["model"]
+                ))
 
         # 启动游戏线程
         self.game = LiarsDiceGame(players)
-        self.game.set_gui(self)  # 设置GUI引用
+        self.game.set_gui(self)
         self.is_game_running = True
         self.game_thread = threading.Thread(target=self.run_game_thread)
         self.game_thread.daemon = True
@@ -295,6 +433,24 @@ class LiarsDiceGUI:
         self.dice_frame = tk.Frame(left_frame, bg="#34495e")
         self.dice_frame.pack(pady=10)
 
+        # 当前赌注显示
+        tk.Label(
+            left_frame,
+            text="当前赌注",
+            font=("Heiti", 12, "bold"),
+            fg="#ecf0f1",
+            bg="#34495e"
+        ).pack(pady=(20, 5))
+
+        self.bid_label = tk.Label(
+            left_frame,
+            bg="#34495e",
+            fg="#ee3636",
+            font=("Heiti", 12, "bold"),
+            text="暂无赌注"
+        )
+        self.bid_label.pack(pady=(10, 5))
+
         # 右侧游戏区域
         right_frame = tk.Frame(main_frame, bg="#34495e")
         right_frame.pack(side="right", fill="both", expand=True)
@@ -311,7 +467,7 @@ class LiarsDiceGUI:
         self.log_text = scrolledtext.ScrolledText(
             right_frame,
             height=20,
-            font=("Consolas", 10),
+            font=("Consolas", 14),
             bg="#2c3e50",
             fg="#ecf0f1",
             insertbackground="#ecf0f1"
@@ -379,6 +535,10 @@ class LiarsDiceGUI:
                     bd=2
                 )
                 die_label.grid(row=0, column=i, padx=2)
+
+    def update_bid_display(self, number, value):
+        """更新赌注显示"""
+        self.bid_label.configure(text = f"{number}个{value}点")
 
     def log_message(self, message):
         """添加日志消息"""
@@ -458,7 +618,7 @@ class LiarsDiceGUI:
         behavior_text = tk.Text(
             self.action_frame,
             height=2,
-            width=50,
+            width=200,
             font=("Arial", 10),
             bg="#2c3e50",
             fg="#ecf0f1",
