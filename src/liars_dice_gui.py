@@ -38,6 +38,7 @@ class LiarsDiceGUI:
         # 清空界面
         for widget in self.root.winfo_children():
             widget.destroy()
+        self.game = None
 
         # 标题
         title_label = tk.Label(
@@ -543,9 +544,13 @@ class LiarsDiceGUI:
     def log_message(self, message):
         """添加日志消息"""
         if hasattr(self, 'log_text'):
-            self.log_text.insert(tk.END, message + "\n")
-            self.log_text.see(tk.END)
-            self.root.update()
+            try:
+                self.log_text.insert(tk.END, message + "\n")
+                self.log_text.see(tk.END)
+                self.root.update()
+            except tk.TclError:
+                # 忽略日志
+                pass
 
     def show_human_action_interface(self, is_first, current_bid_number, current_bid_value):
         """显示人类玩家操作界面"""
@@ -696,7 +701,12 @@ class LiarsDiceGUI:
         """返回主菜单"""
         if self.is_game_running:
             if messagebox.askyesno("确认", "游戏正在进行中，确定要返回主菜单吗？"):
+                self.game.logger.warning("游戏已被迫终止！")
                 self.is_game_running = False
+                if self.human_action_event:
+                    self.human_action_event.set()       # 防止游戏线程卡死
+                self.game.logger.handlers.clear()
+                # self.game_thread.join()
                 self.create_main_interface()
         else:
             self.create_main_interface()
@@ -710,27 +720,27 @@ def get_human_action(self):
     """获取人类玩家的操作"""
     if not hasattr(self, 'gui'):
         raise RuntimeError("Human player needs GUI reference")
-    
+
     gui = self.gui
-    
+
     # 创建事件
     gui.human_action_event = threading.Event()
     gui.human_action_result = None
-    
+
     # 获取当前叫点信息
     current_bid_number = getattr(gui.game, 'dice_number', 0)
     current_bid_value = getattr(gui.game, 'dice_value', 0)
-    
+
     # 更新骰子显示
     # gui.root.after(0, lambda: gui.update_dice_display(self.dice))
-    
+
     # 显示操作界面
     is_first = current_bid_number == 0
     gui.root.after(0, lambda: gui.show_human_action_interface(is_first, current_bid_number, current_bid_value))
-    
+
     # 等待用户操作
     gui.human_action_event.wait()
-    
+
     return gui.human_action_result
 
 # 修改Player类
