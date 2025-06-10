@@ -64,6 +64,7 @@ class LiarsDiceGame():
         if self.game_mode == "ai_only":
             self.log_to_gui(f"💭 理由：{action['reason']}")
         self.log_to_gui(f"🎭 {action['behaviour']}")
+        self.log_to_gui("-" * 50)
 
         # 判断合法性
         if action['number'] > self.dice_number or (action['number'] == self.dice_number and action['value'] > self.dice_value):
@@ -91,6 +92,7 @@ class LiarsDiceGame():
         if self.game_mode == "ai_only":
             self.log_to_gui(f"💭 理由：{action['reason']}")
         self.log_to_gui(f"🎭 {action['behaviour']}")
+        self.log_to_gui("-" * 50)
 
         # 计算骰子总数
         total_dice = sum(player.count_dice(self.dice_value) for player in self.active_players)
