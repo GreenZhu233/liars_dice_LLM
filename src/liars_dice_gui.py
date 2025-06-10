@@ -43,12 +43,12 @@ class LiarsDiceGUI:
         # 标题
         title_label = tk.Label(
             self.root,
-            text="Liar's Dice Game",
-            font=("Arial", 24, "bold"),
+            text="谎 言 骰 子",
+            font=("Heiti", 32, "bold"),
             fg="#ecf0f1",
             bg="#2c3e50"
         )
-        title_label.pack(pady=30)
+        title_label.pack(pady=60)
 
         # 游戏模式选择框
         mode_frame = tk.Frame(self.root, bg="#2c3e50")
