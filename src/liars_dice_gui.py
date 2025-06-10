@@ -706,9 +706,11 @@ class LiarsDiceGUI:
     def show_game_result(self, winner):
         """显示游戏结果"""
         result_msg = f"游戏结束！\n获胜者：{winner}"
-        messagebox.showinfo("游戏结果", result_msg)
         self.log_message(f"\n🎉 游戏结束！获胜者：{winner} 🎉")
+        for widget in self.action_frame.winfo_children():
+            widget.destroy()
         self.is_game_running = False
+        messagebox.showinfo("游戏结果", result_msg)
 
     def return_to_main(self):
         """返回主菜单"""
