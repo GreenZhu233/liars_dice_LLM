@@ -61,7 +61,7 @@ class LiarsDiceGUI:
         tk.Label(
             mode_frame,
             text="选择游戏模式:",
-            font=("Arial", 14),
+            font=("Heiti", 14),
             fg="#ecf0f1",
             bg="#2c3e50"
         ).pack()
@@ -79,7 +79,7 @@ class LiarsDiceGUI:
                 text=text,
                 variable=self.game_mode,
                 value=value,
-                font=("Arial", 12),
+                font=("Heiti", 12),
                 fg="#ecf0f1",
                 bg="#2c3e50",
                 selectcolor="#34495e",
@@ -92,7 +92,7 @@ class LiarsDiceGUI:
             self.root,
             text="设置API Keys",
             command=self.show_api_settings,
-            font=("Arial", 12),
+            font=("Heiti", 12),
             bg="#3498db",
             fg="white",
             padx=20,
@@ -107,7 +107,7 @@ class LiarsDiceGUI:
             self.root,
             text="角色设置",
             command=self.show_role_settings,
-            font=("Arial", 12),
+            font=("Heiti", 12),
             bg="#9b59b6",
             fg="white",
             padx=20,
@@ -122,7 +122,7 @@ class LiarsDiceGUI:
             self.root,
             text="开始游戏",
             command=self.start_game,
-            font=("Arial", 14, "bold"),
+            font=("Heiti", 14, "bold"),
             bg="#27ae60",
             fg="white",
             padx=30,
@@ -146,7 +146,7 @@ class LiarsDiceGUI:
         tk.Label(
             api_window,
             text="API Keys 配置",
-            font=("Arial", 16, "bold"),
+            font=("Heiti", 16, "bold"),
             fg="#ecf0f1",
             bg="#2c3e50"
         ).pack(pady=20)
@@ -158,14 +158,14 @@ class LiarsDiceGUI:
         tk.Label(
             deepseek_frame,
             text="DeepSeek API Key:",
-            font=("Arial", 12),
+            font=("Heiti", 12),
             fg="#ecf0f1",
             bg="#2c3e50"
         ).pack(anchor="w")
 
         deepseek_entry = tk.Entry(
             deepseek_frame,
-            font=("Arial", 11),
+            font=("Heiti", 11),
             width=50,
             show="*"
         )
@@ -179,14 +179,14 @@ class LiarsDiceGUI:
         tk.Label(
             doubao_frame,
             text="Doubao API Key:",
-            font=("Arial", 12),
+            font=("Heiti", 12),
             fg="#ecf0f1",
             bg="#2c3e50"
         ).pack(anchor="w")
 
         doubao_entry = tk.Entry(
             doubao_frame,
-            font=("Arial", 11),
+            font=("Heiti", 11),
             width=50,
             show="*"
         )
@@ -218,7 +218,7 @@ class LiarsDiceGUI:
             button_frame,
             text="保存",
             command=save_config,
-            font=("Arial", 12),
+            font=("Heiti", 12),
             bg="#27ae60",
             fg="white",
             padx=20,
@@ -231,7 +231,7 @@ class LiarsDiceGUI:
             button_frame,
             text="取消",
             command=api_window.destroy,
-            font=("Arial", 12),
+            font=("Heiti", 12),
             bg="#e74c3c",
             fg="white",
             padx=20,
@@ -251,7 +251,7 @@ class LiarsDiceGUI:
         tk.Label(
             role_window,
             text="角色配置",
-            font=("Arial", 16, "bold"),
+            font=("Heiti", 16, "bold"),
             fg="#ecf0f1",
             bg="#2c3e50"
         ).pack(pady=20)
@@ -279,19 +279,19 @@ class LiarsDiceGUI:
             tk.Label(
                 frame,
                 text=f"玩家 {i+1}:(AI)" if i > 0 else "玩家 1:(AI或人类玩家)",
-                font=("Arial", 12, "bold"),
+                font=("Heiti", 12, "bold"),
                 fg="#ecf0f1",
                 bg="#34495e"
             ).grid(row=0, column=0, columnspan=2, pady=5, sticky="w")
 
             # 玩家名字
-            tk.Label(frame, text="名字:", font=("Arial", 10), fg="#ecf0f1", bg="#34495e").grid(row=2, column=0, sticky="w", padx=5)
+            tk.Label(frame, text="名字:", font=("Heiti", 10), fg="#ecf0f1", bg="#34495e").grid(row=2, column=0, sticky="w", padx=5)
             name_var = tk.StringVar(value=role["name"])
             name_entry = tk.Entry(frame, textvariable=name_var, width=15)
             name_entry.grid(row=2, column=1, padx=5, pady=2)
 
             # AI模型
-            tk.Label(frame, text="AI模型:", font=("Arial", 10), fg="#ecf0f1", bg="#34495e").grid(row=3, column=0, sticky="w", padx=5)
+            tk.Label(frame, text="AI模型:", font=("Heiti", 10), fg="#ecf0f1", bg="#34495e").grid(row=3, column=0, sticky="w", padx=5)
             model_var = tk.StringVar(value=role["model"])
             model_combo = ttk.Combobox(
                 frame,
@@ -338,7 +338,7 @@ class LiarsDiceGUI:
             button_frame,
             text="保存配置",
             command=save_roles,
-            font=("Arial", 12),
+            font=("Heiti", 12),
             bg="#27ae60",
             fg="white",
             padx=20,
@@ -351,7 +351,7 @@ class LiarsDiceGUI:
             button_frame,
             text="取消",
             command=role_window.destroy,
-            font=("Arial", 12),
+            font=("Heiti", 12),
             bg="#e74c3c",
             fg="white",
             padx=20,
@@ -420,7 +420,7 @@ class LiarsDiceGUI:
         tk.Label(
             left_frame,
             text="玩家状态",
-            font=("Arial", 14, "bold"),
+            font=("Heiti", 14, "bold"),
             fg="#ecf0f1",
             bg="#34495e"
         ).pack(pady=10)
@@ -432,8 +432,8 @@ class LiarsDiceGUI:
         if self.game_mode.get() != 'ai_only':
             tk.Label(
                 left_frame,
-                text="你的骰子",
-                font=("Arial", 12, "bold"),
+                text=f"你({self.role_config[0]["name"]})的骰子",
+                font=("Heiti", 12, "bold"),
                 fg="#ecf0f1",
                 bg="#34495e"
             ).pack(pady=(20, 5))
@@ -467,7 +467,7 @@ class LiarsDiceGUI:
         tk.Label(
             right_frame,
             text="游戏日志",
-            font=("Arial", 14, "bold"),
+            font=("Heiti", 14, "bold"),
             fg="#ecf0f1",
             bg="#34495e"
         ).pack(pady=10)
@@ -492,7 +492,7 @@ class LiarsDiceGUI:
             left_frame,
             text="返回主菜单",
             command=self.return_to_main,
-            font=("Arial", 10),
+            font=("Heiti", 10),
             bg="#e74c3c",
             fg="white",
             padx=15,
@@ -519,7 +519,7 @@ class LiarsDiceGUI:
             tk.Label(
                 player_frame,
                 text=info_text,
-                font=("Arial", 11),
+                font=("Heiti", 11),
                 fg="#ecf0f1" if player.is_alive() else "#95a5a6",
                 bg="#2c3e50"
             ).pack(pady=5)
@@ -535,7 +535,7 @@ class LiarsDiceGUI:
                 die_label = tk.Label(
                     self.dice_frame,
                     text=str(die),
-                    font=("Arial", 16, "bold"),
+                    font=("Heiti", 16, "bold"),
                     fg="#ecf0f1",
                     bg="#e74c3c",
                     width=3,
@@ -574,7 +574,7 @@ class LiarsDiceGUI:
         tk.Label(
             self.action_frame,
             text="轮到你行动！",
-            font=("Arial", 14, "bold"),
+            font=("Heiti", 14, "bold"),
             fg="#f39c12",
             bg="#34495e"
         ).pack(pady=10)
@@ -589,7 +589,7 @@ class LiarsDiceGUI:
                 text="质疑上家",
                 variable=action_type,
                 value="challenge",
-                font=("Arial", 12),
+                font=("Heiti", 12),
                 fg="#ecf0f1",
                 bg="#34495e",
                 selectcolor="#2c3e50",
@@ -602,7 +602,7 @@ class LiarsDiceGUI:
             text="叫点",
             variable=action_type,
             value="bid",
-            font=("Arial", 12),
+            font=("Heiti", 12),
             fg="#ecf0f1",
             bg="#34495e",
             selectcolor="#2c3e50",
@@ -614,21 +614,21 @@ class LiarsDiceGUI:
         bid_frame = tk.Frame(self.action_frame, bg="#34495e")
         bid_frame.pack(pady=10)
 
-        tk.Label(bid_frame, text="数量:", font=("Arial", 12), fg="#ecf0f1", bg="#34495e").grid(row=0, column=0, padx=5)
+        tk.Label(bid_frame, text="数量:", font=("Heiti", 12), fg="#ecf0f1", bg="#34495e").grid(row=0, column=0, padx=5)
         number_var = tk.StringVar(value=str(current_bid_number + 1))
-        number_entry = tk.Spinbox(bid_frame, from_=1, to=20, textvariable=number_var, width=5, font=("Arial", 12))
+        number_entry = tk.Spinbox(bid_frame, from_=1, to=20, textvariable=number_var, width=5, font=("Heiti", 12))
         number_entry.grid(row=0, column=1, padx=5)
 
-        tk.Label(bid_frame, text="点数:", font=("Arial", 12), fg="#ecf0f1", bg="#34495e").grid(row=0, column=2, padx=5)
+        tk.Label(bid_frame, text="点数:", font=("Heiti", 12), fg="#ecf0f1", bg="#34495e").grid(row=0, column=2, padx=5)
         value_var = tk.StringVar(value=str(current_bid_value))
-        value_spinbox = tk.Spinbox(bid_frame, from_=1, to=6, textvariable=value_var, width=5, font=("Arial", 12))
+        value_spinbox = tk.Spinbox(bid_frame, from_=1, to=6, textvariable=value_var, width=5, font=("Heiti", 12))
         value_spinbox.grid(row=0, column=3, padx=5)
 
         # 表现输入
         tk.Label(
             self.action_frame,
             text="表现/发言:",
-            font=("Arial", 12),
+            font=("Heiti", 12),
             fg="#ecf0f1",
             bg="#34495e"
         ).pack(anchor="w", pady=(10, 5))
@@ -637,7 +637,7 @@ class LiarsDiceGUI:
             self.action_frame,
             height=2,
             width=200,
-            font=("Arial", 10),
+            font=("Heiti", 10),
             bg="#2c3e50",
             fg="#ecf0f1",
             insertbackground="#ecf0f1"
@@ -668,7 +668,7 @@ class LiarsDiceGUI:
                 tk.Label(
                     self.action_frame,
                     text="等待其他玩家...",
-                    font=("Arial", 12),
+                    font=("Heiti", 12),
                     fg="#95a5a6",
                     bg="#34495e"
                 ).pack(pady=20)
@@ -684,7 +684,7 @@ class LiarsDiceGUI:
             self.action_frame,
             text="确认",
             command=submit_action,
-            font=("Arial", 12, "bold"),
+            font=("Heiti", 12, "bold"),
             bg="#27ae60",
             fg="white",
             padx=20,
