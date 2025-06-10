@@ -7,6 +7,7 @@ import time
 from typing import Dict, Any
 from src.game import LiarsDiceGame
 from src.players import Player
+from src.snippets import *
 
 class LiarsDiceGUI:
     def __init__(self):
@@ -22,13 +23,18 @@ class LiarsDiceGUI:
         self.human_action_event = None
         self.human_action_result = None
 
-        # 默认角色配置
-        self.role_config = [
-            {"name": "Alice", "model": "deepseek-chat"},
-            {"name": "Bob", "model": "deepseek-chat"},
-            {"name": "Charlie", "model": "deepseek-chat"},
-            {"name": "David", "model": "deepseek-chat"}
-        ]
+        # 加载角色配置
+        os.makedirs("config", exist_ok=True)
+        try:
+            with open("config/players.json", "r", encoding="utf-8") as f:
+                self.role_config = json.load(f)
+        except:
+            self.role_config = [
+                {"name": "Alice", "model": "deepseek-chat"},
+                {"name": "Bob", "model": "deepseek-chat"},
+                {"name": "Charlie", "model": "deepseek-chat"},
+                {"name": "David", "model": "deepseek-chat"}
+            ]
 
         # 创建主界面
         self.create_main_interface()
@@ -322,6 +328,8 @@ class LiarsDiceGUI:
                     })
 
                 self.role_config = new_config
+                with open("config/players.json", "w", encoding="utf-8") as f:
+                    json.dump(new_config, f, indent=2)
                 messagebox.showinfo("成功", "角色配置保存成功！")
                 role_window.destroy()
 
@@ -366,9 +374,10 @@ class LiarsDiceGUI:
         """开始游戏"""
         # 检查API keys
         config = self.load_api_config()
-        if not config.get("DEEPSEEK_API_KEY"):
-            messagebox.showerror("错误", "请先设置DeepSeek API Key！")
-            return
+        for role in self.role_config:
+            if not config.get(model_to_key_name[role["model"]]):
+                messagebox.showerror("错误", "请先配置好 API Key！")
+                return
 
         # 创建游戏界面
         self.create_game_interface()

@@ -1,5 +1,6 @@
 from openai import OpenAI
 import json
+from src.snippets import *
 
 class OpenAILLMClient:
     def __init__(self, model="deepseek-chat"):
@@ -7,18 +8,11 @@ class OpenAILLMClient:
         # 打开并读取文件
         with open('config/keys.json', 'r', encoding='utf-8') as f:
             config = json.load(f)
-        match model:
-            case "deepseek-chat":
-                api_key = config.get("DEEPSEEK_API_KEY")
-                base_url = "https://api.deepseek.com"
-            case "deepseek-reasoner":
-                api_key = config.get("DEEPSEEK_API_KEY")
-                base_url = "https://api.deepseek.com"
-            case "doubao-1-5-lite-32k-250115":
-                api_key = config.get("DOUBAO_API_KEY")
-                base_url = "https://ark.cn-beijing.volces.com/api/v3"
-            case _:
-                raise ValueError("Unsupported LLM provider in configuration")
+        try:
+            api_key = config.get(model_to_key_name[model])
+            base_url = model_to_url[model]
+        except:
+            raise ValueError("不支持的LLM供应商！")
 
         self.model = model
 
