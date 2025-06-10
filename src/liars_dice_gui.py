@@ -481,7 +481,7 @@ class LiarsDiceGUI:
 
         # 返回主菜单按钮
         tk.Button(
-            right_frame,
+            left_frame,
             text="返回主菜单",
             command=self.return_to_main,
             font=("Arial", 10),
@@ -491,7 +491,7 @@ class LiarsDiceGUI:
             pady=5,
             relief="flat",
             cursor="hand2"
-        ).pack(pady=10)
+        ).pack(side='bottom', pady=30)
 
     def update_players_info(self, players):
         """更新玩家信息显示"""
