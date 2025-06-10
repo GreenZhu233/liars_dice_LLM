@@ -447,8 +447,8 @@ class LiarsDiceGUI:
             left_frame,
             bg="#34495e",
             fg="#ee3636",
-            font=("Heiti", 12, "bold"),
-            text="暂无赌注"
+            font=("Heiti", 16, "bold"),
+            text=""
         )
         self.bid_label.pack(pady=(10, 5))
 
@@ -539,7 +539,10 @@ class LiarsDiceGUI:
 
     def update_bid_display(self, number, value):
         """更新赌注显示"""
-        self.bid_label.configure(text = f"{number}个{value}点")
+        if number:
+            self.bid_label.configure(text = f"{number} 个 {value} 点")
+        else:
+            self.bid_label.configure(text = "")
 
     def log_message(self, message):
         """添加日志消息"""

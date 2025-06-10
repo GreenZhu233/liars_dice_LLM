@@ -147,6 +147,7 @@ class LiarsDiceGame():
         # 更新GUI玩家信息
         if self.gui and self.gui.is_game_running:
             self.gui.root.after(0, lambda: self.gui.update_players_info(self.active_players))
+            self.gui.update_bid_display(0, 0)
 
     def start_round(self):
         """开始一轮游戏"""
