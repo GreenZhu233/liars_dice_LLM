@@ -3,8 +3,6 @@ from tkinter import ttk, messagebox, scrolledtext
 import json
 import os
 import threading
-import time
-from typing import Dict, Any
 from src.game import LiarsDiceGame
 from src.players import Player
 from src.snippets import *
@@ -483,6 +481,7 @@ class LiarsDiceGUI:
             insertbackground="#ecf0f1"
         )
         self.log_text.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+        self.log_text.config(state='disabled')
 
         # 人类玩家操作区域
         self.action_frame = tk.Frame(right_frame, bg="#34495e")
@@ -557,8 +556,10 @@ class LiarsDiceGUI:
         """添加日志消息"""
         if hasattr(self, 'log_text'):
             try:
+                self.log_text.config(state='normal')
                 self.log_text.insert(tk.END, message + "\n")
                 self.log_text.see(tk.END)
+                self.log_text.config(state='disabled')
                 self.root.update()
             except tk.TclError:
                 # 忽略日志
@@ -742,9 +743,6 @@ def get_human_action(self):
     # 获取当前叫点信息
     current_bid_number = getattr(gui.game, 'dice_number', 0)
     current_bid_value = getattr(gui.game, 'dice_value', 0)
-
-    # 更新骰子显示
-    # gui.root.after(0, lambda: gui.update_dice_display(self.dice))
 
     # 显示操作界面
     is_first = current_bid_number == 0
