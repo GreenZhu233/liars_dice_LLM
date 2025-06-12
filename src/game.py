@@ -4,6 +4,7 @@ import time
 import random
 import os
 from typing import List, Dict, Any
+import uuid
 
 class LiarsDiceGame():
     def __init__(self, players: List[Player], stream_output = True):
@@ -38,9 +39,11 @@ class LiarsDiceGame():
     def create_logger(self, stream_output):
         """创建日志记录器"""
         os.makedirs('logs', exist_ok=True)
-        logger = logging.getLogger(__name__)
+        uuid4 = str(uuid.uuid4())
+        logger = logging.getLogger(uuid4)
         logger.setLevel(logging.INFO)
-        file_handler = logging.FileHandler(f"logs/game_log_{time.strftime('%Y%m%d_%H%M%S')}.log", encoding="utf-8")
+        self.log_path = f"logs/{time.strftime('%Y%m%d_%H%M%S')}_{uuid4}.log"
+        file_handler = logging.FileHandler(self.log_path, encoding="utf-8")
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
