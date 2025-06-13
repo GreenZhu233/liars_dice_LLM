@@ -188,7 +188,7 @@ class LiarsDiceGame():
             if self.human_player and self.human_player.is_alive():
                 self.gui.update_dice_display([self.human_player.dice])    # 更新人类玩家的骰子显示
             else:
-                dices = [player.dice for player in self.players]
+                dices = [player.dice for player in self.players if player.is_alive()]
                 self.gui.update_dice_display(dices)                     # 更新所有玩家的骰子显示
 
         # 日志
