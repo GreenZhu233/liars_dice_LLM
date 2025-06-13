@@ -34,6 +34,13 @@ class LiarsDiceGUI:
                 {"name": "David", "model": "deepseek-chat"}
             ]
 
+        # 加载骰子图片
+        self.dice_images = []
+        for i in range(1,7):
+            img_path = os.path.join("images", f"dice{i}.png")
+            img = tk.PhotoImage(file=img_path)
+            self.dice_images.append(img)
+
         # 创建主界面
         self.create_main_interface()
 
@@ -534,15 +541,14 @@ class LiarsDiceGUI:
             for i, die in enumerate(dice):
                 die_label = tk.Label(
                     self.dice_frame,
-                    text=str(die),
-                    font=("Heiti", 16, "bold"),
-                    fg="#ecf0f1",
-                    bg="#e74c3c",
-                    width=3,
-                    height=1,
+                    image=self.dice_images[die-1],
+                    bg="#2c3e50",
+                    width=48,
+                    height=48,
                     relief="solid",
                     bd=2
                 )
+                die_label.image = self.dice_images[die - 1]
                 die_label.grid(row=0, column=i, padx=2)
 
     def update_bid_display(self, number, value):
