@@ -60,7 +60,7 @@ class Answer(BaseModel):
     behaviour: str
 
 class GoogleLLMClient:
-    def __init__(self, model="gemini-2.0-flash"):
+    def __init__(self, model="gemini-2.5-flash-preview-05-20"):
         """初始化LLM客户端"""
         # 打开并读取文件
         with open('config/keys.json', 'r', encoding='utf-8') as f:
@@ -88,7 +88,7 @@ class GoogleLLMClient:
         try:
             response = self.client.models.generate_content(
                 model=self.model,
-                contents=messages,
+                contents=messages[0]['content'] + messages[1]['content'],
                 config={
                     "response_mime_type": "application/json",
                     "response_schema": list[Answer],

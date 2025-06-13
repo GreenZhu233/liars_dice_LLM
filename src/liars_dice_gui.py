@@ -199,6 +199,27 @@ class LiarsDiceGUI:
         doubao_entry.pack(pady=5, fill="x")
         doubao_entry.insert(0, config.get("DOUBAO_API_KEY", ""))
 
+        # Google API Key
+        google_frame = tk.Frame(api_window, bg="#2c3e50")
+        google_frame.pack(pady=10, padx=20, fill='x')
+
+        tk.Label(
+            google_frame,
+            text="Doubao API Key:",
+            font=("Heiti", 12),
+            fg="#ecf0f1",
+            bg="#2c3e50"
+        ).pack(anchor="w")
+
+        google_entry = tk.Entry(
+            google_frame,
+            font=("Heiti", 11),
+            width=50,
+            show="*"
+        )
+        google_entry.pack(pady=5, fill="x")
+        google_entry.insert(0, config.get("GOOGLE_API_KEY", ""))
+
         # 按钮框架
         button_frame = tk.Frame(api_window, bg="#2c3e50")
         button_frame.pack(pady=30)
@@ -206,7 +227,8 @@ class LiarsDiceGUI:
         def save_config():
             config = {
                 "DEEPSEEK_API_KEY": deepseek_entry.get().strip(),
-                "DOUBAO_API_KEY": doubao_entry.get().strip()
+                "DOUBAO_API_KEY": doubao_entry.get().strip(),
+                "GOOGLE_API_KEY": google_entry.get().strip()
             }
 
             # 确保config目录存在
@@ -302,7 +324,7 @@ class LiarsDiceGUI:
             model_combo = ttk.Combobox(
                 frame,
                 textvariable=model_var,
-                values=["deepseek-chat", "deepseek-reasoner", "doubao-1-5-lite-32k-250115"],
+                values=["deepseek-chat", "deepseek-reasoner", "doubao-1-5-lite-32k-250115", "gemini-2.5-flash-preview-05-20"],
                 state="readonly",
                 width=20
             )
@@ -462,8 +484,9 @@ class LiarsDiceGUI:
             bg="#34495e",
             width=48,
             height=48,
-            relief="solid",
-            bd=2
+            bd=2,
+            borderwidth=0,
+            relief="flat"
         )
         self.bid_dice.place(relx=0.55, rely=0.1)
 
@@ -552,11 +575,12 @@ class LiarsDiceGUI:
                 die_label = tk.Label(
                     self.dice_frames[p],
                     image=self.dice_images[die-1],
-                    bg="#2c3e50",
+                    bg="#34495e",
                     width=48,
                     height=48,
-                    relief="solid",
-                    bd=2
+                    bd=2,
+                    borderwidth=0,
+                    relief="flat"
                 )
                 die_label.image = self.dice_images[die - 1]
                 die_label.grid(row=0, column=i, padx=2)
