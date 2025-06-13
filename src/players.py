@@ -2,8 +2,9 @@ import random
 import re
 import json
 import threading
-from src.llm_client import OpenAILLMClient
+from src.llm_client import OpenAILLMClient, GoogleLLMClient
 from typing import List, Dict, Any
+from src.snippets import *
 
 RULE_PATH = "template/rule.txt"
 ACTION_PROMPT_TEMPLATE_PATH = "template/action_prompt_template.txt"
@@ -22,7 +23,13 @@ class Player():
         self.model = model
         self.dice = []      # 骰子列表
         self.poison = 2     # 毒药数量
-        self.llm_client = OpenAILLMClient(self.model) if not is_human else None
+        match model_to_API[model]:
+            case "OpenAI":
+                self.llm_client = OpenAILLMClient(self.model) if not is_human else None
+            case "Google":
+                self.llm_client = GoogleLLMClient(self.model) if not is_human else None
+            case _:
+                raise ValueError(f"不支持的模型: {self.model}")
         self.gui = None     # GUI引用，用于人类玩家交互
 
     def roll_dice(self, count):
