@@ -16,6 +16,7 @@ class LiarsDiceGame():
                 self.human_player = player
                 self.game_mode = 'human_vs_ai'
                 break
+        self.is_running = True
         self.round = 0
         self.active_players = []
         self.first_player = self.players[random.randint(0, len(self.players) - 1)]  # 随机选择第一个玩家
@@ -55,7 +56,7 @@ class LiarsDiceGame():
 
     def log_to_gui(self, message):
         """向GUI发送日志消息"""
-        if self.gui and self.gui.is_game_running:
+        if self.gui and self.is_running:
             self.gui.root.after(0, lambda: self.gui.log_message(message))
 
     def handle_bid(self, player: Player, action: Dict[str, Any]) -> bool:
@@ -77,7 +78,7 @@ class LiarsDiceGame():
             self.round_action_info += f"{player.name} 叫点：{action['number']}个{action['value']}点。\n"
             self.extra_hint = ""
             self.current_player_index = (self.current_player_index + 1) % len(self.active_players)      # 切换下一个玩家行动
-            if self.gui and self.gui.is_game_running:
+            if self.gui and self.is_running:
                 self.gui.update_bid_display(action['number'], action['value'])
             return True
         else:
@@ -150,7 +151,7 @@ class LiarsDiceGame():
                 self.first_player = next_player     # 质疑者下家成为下一轮的第一个玩家
 
         # 更新GUI玩家信息
-        if self.gui and self.gui.is_game_running:
+        if self.gui and self.is_running:
             self.gui.root.after(0, lambda: self.gui.update_players_info(self.active_players))
             self.gui.update_bid_display(0, 0)
 
@@ -171,7 +172,7 @@ class LiarsDiceGame():
         self.log_to_gui("=" * 50)
 
         # 更新GUI玩家信息
-        if self.gui and self.gui.is_game_running:
+        if self.gui and self.is_running:
             self.gui.root.after(0, lambda: self.gui.update_players_info(self.active_players))
 
         # 重置当前的赌注
@@ -182,7 +183,7 @@ class LiarsDiceGame():
         for player in self.active_players:
             player.roll_dice(5)
 
-        if self.gui and self.gui.is_game_running:
+        if self.gui and self.is_running:
             time.sleep(3)
             if self.human_player and self.human_player.is_alive():
                 self.gui.update_dice_display([self.human_player.dice])    # 更新人类玩家的骰子显示
@@ -221,6 +222,9 @@ class LiarsDiceGame():
                     round_action_info=self.round_action_info,
                     extra_hint=self.extra_hint
                 )
+                # 处理退出逻辑
+                if self.gui and (not self.is_running):
+                    return
                 # 显示AI思考过程
                 if reasoning:
                     self.log_to_gui(f"🤔 {player.name} 思考：{reasoning}")
@@ -247,7 +251,7 @@ class LiarsDiceGame():
                 else:
                     error_times += 1
             # 处理退出逻辑
-            if self.gui and (not self.gui.is_game_running):
+            if self.gui and (not self.is_running):
                 return
 
     def start_game(self) -> str:
@@ -261,7 +265,7 @@ class LiarsDiceGame():
         while len(self.active_players) > 1:
             self.start_round()
             # 处理退出逻辑
-            if self.gui and (not self.gui.is_game_running):
+            if self.gui and (not self.is_running):
                 return ""
             if len(self.active_players) > 1:
                 self.log_to_gui(f"📊 本轮结束，还有 {len(self.active_players)} 名玩家存活")

@@ -49,7 +49,6 @@ class LiarsDiceGUI:
         # 清空界面
         for widget in self.root.winfo_children():
             widget.destroy()
-        self.game = None
 
         # 标题
         title_label = tk.Label(
@@ -397,7 +396,7 @@ class LiarsDiceGUI:
                 players.append(Player(
                     name=role["name"],
                     is_human=False if i > 0 else True,
-                    model=role["model"]
+                    model=role["model"] if i > 0 else ""
                 ))
 
         # 启动游戏线程
@@ -716,7 +715,7 @@ class LiarsDiceGUI:
         """运行游戏线程"""
         try:
             winner = self.game.start_game()
-            if self.is_game_running:
+            if self.is_game_running and winner:
                 self.root.after(0, lambda: self.show_game_result(winner))
         except Exception as e:
             if self.is_game_running:
@@ -737,6 +736,7 @@ class LiarsDiceGUI:
             if messagebox.askyesno("确认", "游戏正在进行中，确定要返回主菜单吗？"):
                 self.game.logger.warning("游戏已被迫终止！")
                 self.is_game_running = False
+                self.game.is_running = False
                 if self.human_action_event:
                     self.human_action_event.set()       # 防止游戏线程卡死
                 self.game.logger.handlers.clear()
