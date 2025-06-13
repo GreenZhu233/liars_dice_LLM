@@ -419,52 +419,54 @@ class LiarsDiceGUI:
         main_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
         # 左侧信息面板
-        left_frame = tk.Frame(main_frame, bg="#34495e", width=300)
-        left_frame.pack(side="left", fill="y", padx=(0, 10))
-        left_frame.pack_propagate(False)
+        self.left_frame = tk.Frame(main_frame, bg="#34495e", width=300)
+        self.left_frame.pack(side="left", fill="y", padx=(0, 10))
+        self.left_frame.pack_propagate(False)
 
         # 玩家信息
         tk.Label(
-            left_frame,
+            self.left_frame,
             text="玩家状态",
-            font=("Heiti", 14, "bold"),
+            font=("Heiti", 22, "bold"),
             fg="#ecf0f1",
             bg="#34495e"
         ).pack(pady=10)
 
-        self.players_info = tk.Frame(left_frame, bg="#34495e")
+        self.players_info = tk.Frame(self.left_frame, bg="#34495e")
         self.players_info.pack(fill="x", padx=10)
 
-        # 当前骰子显示
-        if self.game_mode.get() != 'ai_only':
-            tk.Label(
-                left_frame,
-                text=f"你({self.role_config[0]["name"]})的骰子",
-                font=("Heiti", 12, "bold"),
-                fg="#ecf0f1",
-                bg="#34495e"
-            ).pack(pady=(20, 5))
-
-        self.dice_frame = tk.Frame(left_frame, bg="#34495e")
-        self.dice_frame.pack(pady=10)
+        self.dice_frames = []
 
         # 当前赌注显示
         tk.Label(
-            left_frame,
+            self.left_frame,
             text="当前赌注",
-            font=("Heiti", 12, "bold"),
+            font=("Heiti", 22, "bold"),
             fg="#ecf0f1",
             bg="#34495e"
         ).pack(pady=(20, 5))
 
+        self.bid_frame = tk.Frame(self.left_frame, bg="#34495e", height=60)
+        self.bid_frame.pack(fill='x', padx=10)
+
         self.bid_label = tk.Label(
-            left_frame,
+            self.bid_frame,
             bg="#34495e",
             fg="#ee3636",
-            font=("Heiti", 16, "bold"),
+            font=("Heiti", 22, "bold"),
             text=""
         )
-        self.bid_label.pack(pady=(10, 5))
+        self.bid_label.place(relx=0.3, rely=0.2)
+
+        self.bid_dice = tk.Label(
+            self.bid_frame,
+            bg="#34495e",
+            width=48,
+            height=48,
+            relief="solid",
+            bd=2
+        )
+        self.bid_dice.place(relx=0.55, rely=0.1)
 
         # 右侧游戏区域
         right_frame = tk.Frame(main_frame, bg="#34495e")
@@ -496,7 +498,7 @@ class LiarsDiceGUI:
 
         # 返回主菜单按钮
         tk.Button(
-            left_frame,
+            self.left_frame,
             text="返回主菜单",
             command=self.return_to_main,
             font=("Heiti", 10),
@@ -514,33 +516,42 @@ class LiarsDiceGUI:
         for widget in self.players_info.winfo_children():
             widget.destroy()
 
+        # for dice_frame in self.dice_frames:
+        #     for widget in dice_frame.winfo_children():
+        #         widget.destroy()
+        del self.dice_frames
+        self.dice_frames = []
+
         for player in players:
             player_frame = tk.Frame(self.players_info, bg="#2c3e50", relief="solid", bd=1)
             player_frame.pack(fill="x", pady=2)
 
             # 玩家名称和毒药数量
             info_text = f"{player.name}: {player.poison}瓶毒药"
-            if not player.is_alive():
-                info_text += " (已死亡)"
 
             tk.Label(
                 player_frame,
                 text=info_text,
-                font=("Heiti", 11),
+                font=("Heiti", 12),
                 fg="#ecf0f1" if player.is_alive() else "#95a5a6",
                 bg="#2c3e50"
             ).pack(pady=5)
 
-    def update_dice_display(self, dice):
-        """更新骰子显示"""
-        # 清空现有骰子
-        for widget in self.dice_frame.winfo_children():
-            widget.destroy()
+            dice_frame = tk.Frame(self.players_info, bg="#34495e")
+            dice_frame.pack(fill='x', pady=10)
+            self.dice_frames.append(dice_frame)
 
-        if dice:
+    def update_dice_display(self, dices):
+        """更新在场玩家骰子显示"""
+        # 清空现有骰子
+        for dice_frame in self.dice_frames:
+            for widget in dice_frame.winfo_children():
+                widget.destroy()
+
+        for p, dice in enumerate(dices):
             for i, die in enumerate(dice):
                 die_label = tk.Label(
-                    self.dice_frame,
+                    self.dice_frames[p],
                     image=self.dice_images[die-1],
                     bg="#2c3e50",
                     width=48,
@@ -554,9 +565,11 @@ class LiarsDiceGUI:
     def update_bid_display(self, number, value):
         """更新赌注显示"""
         if number:
-            self.bid_label.configure(text = f"{number} 个 {value} 点")
+            self.bid_label.configure(text = f"{number} X ")
+            self.bid_dice.configure(image=self.dice_images[value-1])
         else:
             self.bid_label.configure(text = "")
+            self.bid_dice.configure(image = "")
 
     def log_message(self, message):
         """添加日志消息"""
@@ -707,7 +720,7 @@ class LiarsDiceGUI:
                 self.root.after(0, lambda: self.show_game_result(winner))
         except Exception as e:
             if self.is_game_running:
-                self.root.after(0, lambda: messagebox.showerror("游戏错误", f"游戏发生错误：{str(e)}"))
+                self.root.after(0, lambda err=e: messagebox.showerror("游戏错误", f"游戏发生错误：{str(err)}"))
 
     def show_game_result(self, winner):
         """显示游戏结果"""

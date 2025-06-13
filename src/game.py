@@ -170,6 +170,10 @@ class LiarsDiceGame():
         self.log_to_gui(round_msg)
         self.log_to_gui("=" * 50)
 
+        # 更新GUI玩家信息
+        if self.gui and self.gui.is_game_running:
+            self.gui.root.after(0, lambda: self.gui.update_players_info(self.active_players))
+
         # 重置当前的赌注
         self.dice_value = 0
         self.dice_number = 0
@@ -177,18 +181,20 @@ class LiarsDiceGame():
         # 摇盅
         for player in self.active_players:
             player.roll_dice(5)
-        if self.gui and self.gui.is_game_running and self.human_player:
-            self.gui.update_dice_display(self.human_player.dice)
+
+        if self.gui and self.gui.is_game_running:
+            time.sleep(3)
+            if self.human_player and self.human_player.is_alive():
+                self.gui.update_dice_display([self.human_player.dice])    # 更新人类玩家的骰子显示
+            else:
+                dices = [player.dice for player in self.players]
+                self.gui.update_dice_display(dices)                     # 更新所有玩家的骰子显示
 
         # 日志
-        log_msg = f"第{self.round}轮开始\n"
+        log_msg = f"第{self.round}轮开始"
         for player in self.active_players:
-            log_msg += f"玩家：{player.name} 骰子：{player.dice} 毒药: {player.poison}瓶\n"
+            log_msg += f"\n玩家：{player.name} 骰子：{player.dice} 毒药: {player.poison}瓶"
         self.logger.info(log_msg)
-
-        # 更新GUI玩家信息
-        if self.gui and self.gui.is_game_running:
-            self.gui.root.after(0, lambda: self.gui.update_players_info(self.active_players))
 
         # 玩家开始行动
         self.current_player_index = self.active_players.index(self.first_player)
@@ -251,10 +257,6 @@ class LiarsDiceGame():
         self.log_to_gui("📋 游戏规则：每人有5个骰子和2瓶毒药，轮流叫点或质疑，败者喝毒药")
 
         self.active_players = self.players.copy()
-
-        # 显示初始玩家信息
-        if self.gui and self.gui.is_game_running:
-            self.gui.root.after(0, lambda: self.gui.update_players_info(self.active_players))
 
         while len(self.active_players) > 1:
             self.start_round()
