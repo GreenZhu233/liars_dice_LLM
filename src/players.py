@@ -23,13 +23,16 @@ class Player():
         self.model = model
         self.dice = []      # 骰子列表
         self.poison = 2     # 毒药数量
-        match model_to_API[model]:
-            case "OpenAI":
-                self.llm_client = OpenAILLMClient(self.model) if not is_human else None
-            case "Google":
-                self.llm_client = GoogleLLMClient(self.model) if not is_human else None
-            case _:
-                raise ValueError(f"不支持的模型: {self.model}")
+        if is_human:
+            self.llm_client = None
+        else:
+            match model_to_API[model]:
+                case "OpenAI":
+                    self.llm_client = OpenAILLMClient(self.model)
+                case "Google":
+                    self.llm_client = GoogleLLMClient(self.model)
+                case _:
+                    raise ValueError(f"不支持的模型: {self.model}")
         self.gui = None     # GUI引用，用于人类玩家交互
 
     def roll_dice(self, count):
