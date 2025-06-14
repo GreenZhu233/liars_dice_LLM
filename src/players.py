@@ -51,7 +51,7 @@ class Player():
             self.poison -= 1
             return True
         return False
-    
+
     def _read_file(self, filepath: str):
         """读取文件内容"""
         try:
@@ -130,106 +130,26 @@ class Player():
                 print(f"尝试 {attempt+1} 解析失败: {str(e)}")
         raise RuntimeError(f"玩家 {self.name} 的get_ai_action方法在多次尝试后失败")
 
-    def get_human_action(self) -> Dict[str, Any]:
-        """
-        获取人类玩家的操作
+    def get_human_action(self):
+        """获取人类玩家的操作"""
+        if not hasattr(self, 'gui'):
+            raise RuntimeError("Human player needs GUI reference")
 
-        Returns:
-            Dict[str, Any]: 包含以下键值对的字典：
-                - challenge: bool, 是否质疑上家
-                - value: int, 所叫的骰子点数(1~6，若选择质疑，填入0)
-                - number: int, 所叫的骰子数量(>=1，若选择质疑，填入0)
-                - reason: str, 选择这么决策(质疑/叫点)的理由
-                - behaviour: str, 一段没有主语的行为/表情/发言等描写，能被其他玩家观察。
-        """
-        if not self.gui:
-            # 如果没有GUI，使用命令行输入
-            return self._get_console_action()
+        gui = self.gui
 
-        # 使用GUI获取操作
-        return self._get_gui_action()
+        # 创建事件
+        gui.human_action_event = threading.Event()
+        gui.human_action_result = None
 
-    def _get_console_action(self) -> Dict[str, Any]:
-        """命令行方式获取人类玩家操作"""
-        print(f"\n{self.name}，轮到你行动了！")
-        print(f"你的骰子：{self.dice}")
-
-        # 获取操作类型
-        while True:
-            action_type = input("选择操作 (1-叫点, 2-质疑): ").strip()
-            if action_type in ['1', '2']:
-                break
-            print("请输入1或2")
-
-        is_challenge = action_type == '2'
-
-        if is_challenge:
-            # 质疑操作
-            reason = input("请输入质疑理由: ").strip()
-            behavior = input("请输入你的表现/发言: ").strip()
-
-            return {
-                "challenge": True,
-                "value": 0,
-                "number": 0,
-                "reason": reason,
-                "behaviour": behavior
-            }
-        else:
-            # 叫点操作
-            while True:
-                try:
-                    number = int(input("请输入叫点数量: "))
-                    if number >= 1:
-                        break
-                    print("数量必须大于等于1")
-                except ValueError:
-                    print("请输入有效数字")
-
-            while True:
-                try:
-                    value = int(input("请输入叫点点数(1-6): "))
-                    if 1 <= value <= 6:
-                        break
-                    print("点数必须在1-6之间")
-                except ValueError:
-                    print("请输入有效数字")
-
-            reason = input("请输入叫点理由: ").strip()
-            behavior = input("请输入你的表现/发言: ").strip()
-
-            return {
-                "challenge": False,
-                "value": value,
-                "number": number,
-                "reason": reason,
-                "behaviour": behavior
-            }
-
-    def _get_gui_action(self) -> Dict[str, Any]:
-        """GUI方式获取人类玩家操作"""
-        # 创建事件用于同步
-        self.gui.human_action_event = threading.Event()
-        self.gui.human_action_result = None
-
-        # 获取当前游戏状态
-        game = self.gui.game
-        current_bid_number = getattr(game, 'dice_number', 0)
-        current_bid_value = getattr(game, 'dice_value', 0)
-        is_first = current_bid_number == 0
-
-        # 更新UI显示
-        self.gui.root.after(0, lambda: self.gui.update_dice_display(self.dice))
-        self.gui.root.after(0, lambda: self.gui.update_players_info(game.active_players))
-        self.gui.root.after(0, lambda: self.gui.log_message(f"轮到 {self.name} 行动"))
+        # 获取当前叫点信息
+        current_bid_number = getattr(gui.game, 'dice_number', 0)
+        current_bid_value = getattr(gui.game, 'dice_value', 0)
 
         # 显示操作界面
-        self.gui.root.after(0, lambda: self.gui.show_human_action_interface(
-            is_first, current_bid_number, current_bid_value
-        ))
+        is_first = current_bid_number == 0
+        gui.root.after(0, lambda: gui.show_human_action_interface(is_first, current_bid_number, current_bid_value))
 
         # 等待用户操作
-        self.gui.human_action_event.wait()
+        gui.human_action_event.wait()
 
-        # 返回结果
-        return self.gui.human_action_result
+        return gui.human_action_result

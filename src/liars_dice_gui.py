@@ -773,34 +773,6 @@ class LiarsDiceGUI:
         """运行GUI"""
         self.root.mainloop()
 
-# 为Player类添加GUI相关方法
-def get_human_action(self):
-    """获取人类玩家的操作"""
-    if not hasattr(self, 'gui'):
-        raise RuntimeError("Human player needs GUI reference")
-
-    gui = self.gui
-
-    # 创建事件
-    gui.human_action_event = threading.Event()
-    gui.human_action_result = None
-
-    # 获取当前叫点信息
-    current_bid_number = getattr(gui.game, 'dice_number', 0)
-    current_bid_value = getattr(gui.game, 'dice_value', 0)
-
-    # 显示操作界面
-    is_first = current_bid_number == 0
-    gui.root.after(0, lambda: gui.show_human_action_interface(is_first, current_bid_number, current_bid_value))
-
-    # 等待用户操作
-    gui.human_action_event.wait()
-
-    return gui.human_action_result
-
-# 修改Player类
-Player.get_human_action = get_human_action
-
 if __name__ == "__main__":
     app = LiarsDiceGUI()
     app.run()
