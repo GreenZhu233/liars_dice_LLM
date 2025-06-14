@@ -315,7 +315,7 @@ class LiarsDiceGUI:
             # 玩家名字
             tk.Label(frame, text="名字:", font=("Heiti", 10), fg="#ecf0f1", bg="#34495e").grid(row=2, column=0, sticky="w", padx=5)
             name_var = tk.StringVar(value=role["name"])
-            name_entry = tk.Entry(frame, textvariable=name_var, width=15)
+            name_entry = tk.Entry(frame, textvariable=name_var, width=30)
             name_entry.grid(row=2, column=1, padx=5, pady=2)
 
             # AI模型
@@ -326,7 +326,7 @@ class LiarsDiceGUI:
                 textvariable=model_var,
                 values=["deepseek-chat", "deepseek-reasoner", "doubao-1-5-lite-32k-250115", "gemini-2.5-flash-preview-05-20"],
                 state="readonly",
-                width=20
+                width=30
             )
             model_combo.grid(row=3, column=1, padx=5, pady=2)
 

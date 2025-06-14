@@ -9,6 +9,7 @@ from src.snippets import *
 RULE_PATH = "template/rule.txt"
 ACTION_PROMPT_TEMPLATE_PATH = "template/action_prompt_template.txt"
 FIRST_PLAYER_ACTION_PROMPT_TEMPLATE_PATH = "template/first_player_action_prompt_template.txt"
+REFLECT_PROMPT_TEMPLATE_PATH = "template/reflect_prompt_template.txt"
 
 class Player():
     def __init__(self, name = "", is_human = False, model: str = ""):
@@ -34,6 +35,7 @@ class Player():
                 case _:
                     raise ValueError(f"不支持的模型: {self.model}")
         self.gui = None     # GUI引用，用于人类玩家交互
+        self.opinions = {}  # 对其他玩家的看法
 
     def roll_dice(self, count):
         self.dice = [random.randint(1, 6) for _ in range(count)]
@@ -61,7 +63,7 @@ class Player():
             print(f"读取文件 {filepath} 失败: {str(e)}")
             return ""
 
-    def get_ai_action(self, is_first: bool, round_base_info: str, round_action_info: str, extra_hint: str = "") -> tuple[Dict[str, Any], str]:
+    def get_ai_action(self, is_first: bool, active_players: List["Player"], round_base_info: str, round_action_info: str, extra_hint: str = "") -> tuple[Dict[str, Any], str]:
         """
         获取AI玩家的动作
         Args:
@@ -88,12 +90,18 @@ class Player():
         # 准备当前手牌信息
         current_dice = ", ".join([str(dice) for dice in self.dice])
 
+        # 获取对其他玩家的印象
+        opinions = "你对其他玩家的了解：\n" + '\n'.join(
+            [f"{p.name}: {self.opinions[p.name]}" for p in active_players if p is not self]
+        )
+
         # 填充模板
         if is_first:
             prompt = first_template.format(
                 player_name = self.name,
                 round_base_info = round_base_info,
                 round_action_info = round_action_info,
+                opinions=opinions,
                 dices = current_dice,
                 extra_hint = extra_hint,
             )
@@ -102,6 +110,7 @@ class Player():
                 player_name = self.name,
                 round_base_info = round_base_info,
                 round_action_info = round_action_info,
+                opinions=opinions,
                 dices = current_dice,
                 extra_hint = extra_hint,
             )
@@ -153,3 +162,52 @@ class Player():
         gui.human_action_event.wait()
 
         return gui.human_action_result
+
+    def init_opinions(self, players: List["Player"]):
+        """初始化对其他玩家的看法"""
+        self.opinions = {player.name: "还不了解这个玩家" for player in players if player is not self}
+
+    def reflect(self, other_players: List["Player"], round_base_info: str, round_action_info: str) -> tuple[bool, str, str]:
+        """更新对其他玩家的看法"""
+        template = self._read_file(REFLECT_PROMPT_TEMPLATE_PATH)
+        rules = self._read_file(RULE_PATH)
+
+        # 填充模板
+        previous_opinions = '\n'.join(
+            [f"{p.name}: {self.opinions.get(p.name, "还不了解这个玩家")}" for p in other_players]
+        )
+        output_format = '\n'.join(
+            [f'"{p.name}": str' for p in other_players]
+        )
+
+        prompt = template.format(
+            self_name=self.name,
+            round_base_info=round_base_info,
+            round_action_info=round_action_info,
+            previous_opinions=previous_opinions,
+            output_format=output_format
+        )
+
+        messages = [{"role": "system", "content": rules},
+        {"role": "user", "content": prompt}]
+
+        # 向LLM发送请求
+        try:
+            content, reasoning_content = self.llm_client.reflect(messages, other_players)
+            json_match = re.search(r'({[\s\S]*})', content)
+            if json_match:
+                json_str = json_match.group(1)
+                result = json.loads(json_str)
+
+                # 更新 opinions
+                for key, value in result.items():
+                    if key in self.opinions.keys():
+                        self.opinions[key] = value
+                    else:
+                        raise Exception(f"不存在的玩家名: {key}")
+
+                return True, content, reasoning_content
+            else:
+                raise Exception("json格式不匹配")
+        except Exception as e:
+            return False, f"{self.name} 反思过程出错: {str(e)}", ""

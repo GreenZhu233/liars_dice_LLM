@@ -3,6 +3,8 @@
 {round_base_info}
 {round_action_info}
 
+{opinions}
+
 你是该轮第一个决策的玩家。
 你的骰子点数是：{dices}
 你可以任意叫点。

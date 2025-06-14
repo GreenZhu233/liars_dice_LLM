@@ -3,6 +3,8 @@
 {round_base_info}
 {round_action_info}
 
+{opinions}
+
 现在轮到你做决策。
 你的骰子点数是：{dices}
 你可以选择质疑上家或继续叫点。
