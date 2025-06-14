@@ -152,7 +152,7 @@ class LiarsDiceGame():
 
         # 更新GUI玩家信息
         if self.gui and self.is_running:
-            self.gui.root.after(0, lambda: self.gui.update_players_info(self.active_players))
+            self.gui.update_players_info(self.active_players)
             self.gui.update_bid_display(0, 0)
 
     def start_round(self):
@@ -173,7 +173,7 @@ class LiarsDiceGame():
 
         # 更新GUI玩家信息
         if self.gui and self.is_running:
-            self.gui.root.after(0, lambda: self.gui.update_players_info(self.active_players))
+            self.gui.update_players_info(self.active_players)
 
         # 重置当前的赌注
         self.dice_value = 0
@@ -184,7 +184,6 @@ class LiarsDiceGame():
             player.roll_dice(5)
 
         if self.gui and self.is_running:
-            time.sleep(3)
             if self.human_player and self.human_player.is_alive():
                 self.gui.update_dice_display([self.human_player.dice])    # 更新人类玩家的骰子显示
             else:

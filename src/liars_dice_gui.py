@@ -532,15 +532,14 @@ class LiarsDiceGUI:
             cursor="hand2"
         ).pack(side='bottom', pady=30)
 
+        self.root.update()
+
     def update_players_info(self, players):
         """更新玩家信息显示"""
         # 清空现有信息
         for widget in self.players_info.winfo_children():
             widget.destroy()
 
-        # for dice_frame in self.dice_frames:
-        #     for widget in dice_frame.winfo_children():
-        #         widget.destroy()
         del self.dice_frames
         self.dice_frames = []
 
@@ -559,9 +558,10 @@ class LiarsDiceGUI:
                 bg="#2c3e50"
             ).pack(pady=5)
 
-            dice_frame = tk.Frame(self.players_info, bg="#34495e")
+            dice_frame = tk.Frame(self.players_info, bg="#34495e", height=48)
             dice_frame.pack(fill='x', pady=10)
             self.dice_frames.append(dice_frame)
+        self.root.update()
 
     def update_dice_display(self, dices):
         """更新在场玩家骰子显示"""
@@ -582,8 +582,8 @@ class LiarsDiceGUI:
                     borderwidth=0,
                     relief="flat"
                 )
-                die_label.image = self.dice_images[die - 1]
                 die_label.grid(row=0, column=i, padx=2)
+        self.root.update()
 
     def update_bid_display(self, number, value):
         """更新赌注显示"""
