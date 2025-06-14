@@ -170,7 +170,7 @@ class LiarsDiceGame():
     def start_round(self):
         """开始一轮游戏"""
         self.round += 1
-        self.round_base_info = f"第{self.round}轮，存活的玩家（按活动顺序）及其剩余的毒药数量为：\n"
+        self.round_base_info = f"第{self.round}轮，{len(self.active_players)}名存活玩家的名字和毒药数量为：\n"
         for player in self.active_players:
             self.round_base_info += f"{player.name}: {player.poison}瓶\n"
         self.round_base_info += f"本轮从{self.first_player.name}开始\n"

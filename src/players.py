@@ -95,6 +95,13 @@ class Player():
             [f"{p.name}: {self.opinions[p.name]}" for p in active_players if p is not self]
         )
 
+        # 添加玩家顺序信息
+        if (l := len(active_players)) > 2:
+            self_index = active_players.index(self)
+            previous = active_players[self_index - 1]
+            next = active_players[(self_index + 1) % l]
+            round_base_info += f"你的上家是{previous.name}，你的下家是{next.name}"
+
         # 填充模板
         if is_first:
             prompt = first_template.format(
