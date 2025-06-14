@@ -205,7 +205,7 @@ class LiarsDiceGUI:
 
         tk.Label(
             google_frame,
-            text="Doubao API Key:",
+            text="Google API Key:",
             font=("Heiti", 12),
             fg="#ecf0f1",
             bg="#2c3e50"
