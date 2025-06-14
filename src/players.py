@@ -181,7 +181,7 @@ class Player():
 
         # 填充模板
         previous_opinions = '\n'.join(
-            [f"{p.name}: {self.opinions.get(p.name, "还不了解这个玩家")}" for p in other_players]
+            [f'{p.name}: {self.opinions.get(p.name, "还不了解这个玩家")}' for p in other_players]
         )
         output_format = '\n'.join(
             [f'"{p.name}": str' for p in other_players]
