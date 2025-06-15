@@ -324,7 +324,7 @@ class LiarsDiceGUI:
             model_combo = ttk.Combobox(
                 frame,
                 textvariable=model_var,
-                values=["deepseek-chat", "deepseek-reasoner", "doubao-1-5-lite-32k-250115", "gemini-2.5-flash-preview-05-20"],
+                values=model_list,
                 state="readonly",
                 width=30
             )
