@@ -170,9 +170,9 @@ class LiarsDiceGame():
     def start_round(self):
         """开始一轮游戏"""
         self.round += 1
-        self.round_base_info = f"第{self.round}轮，{len(self.active_players)}名存活玩家的名字和毒药数量为：\n"
+        self.round_base_info = f"第{self.round}轮，{len(self.active_players)}名存活玩家的名字和毒药数量分别为：\n"
         for player in self.active_players:
-            self.round_base_info += f"{player.name}: {player.poison}瓶\n"
+            self.round_base_info += f"{player.name}: 还剩{player.poison}瓶\n"
         self.round_base_info += f"本轮从{self.first_player.name}开始\n"
         self.round_action_info = ""
         self.extra_hint = ""
@@ -237,16 +237,13 @@ class LiarsDiceGame():
                 # 处理退出逻辑
                 if self.gui and (not self.is_running):
                     return
-                # 显示AI思考过程
-                if reasoning:
-                    self.log_to_gui(f"🤔 {player.name} 思考：{reasoning}")
             else:
                 action = player.get_human_action()
                 reasoning = ""
 
             # 分析处理玩家行动
             if reasoning:
-                self.logger.info(f"{player.name} 思考：{reasoning}")
+                self.logger.info(f"🤔 {player.name} 思考：{reasoning}")
             if not action:
                 self.logger.error(f"{player.name} 行动为空。")
                 raise ValueError(f"{player.name} 行动为空。")
