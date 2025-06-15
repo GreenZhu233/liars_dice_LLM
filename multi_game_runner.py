@@ -1,5 +1,6 @@
 from src.game import LiarsDiceGame
 from src.players import Player
+from src.snippets import *
 import argparse
 import threading
 
@@ -39,6 +40,21 @@ role_config = [
 threads = args.threads
 player_id = {args.name1: 0, args.name2: 1, args.name3: 2, args.name4: 3}
 total_runs = args.total_runs
+
+# 检查名字合法性
+names = [p['name'] for p in role_config if p['name']]
+if len(set(names)) != 4:
+    raise ValueError("玩家名字不能重复、不能为空！")
+
+# 检查模型合法性
+for p in role_config:
+    model = p['model']
+    if model not in model_list:
+        raise ValueError(f"不支持的模型：{model}")
+
+# 打印玩家信息
+for p in role_config:
+    print(p['name'], ':', p['model'])
 
 # 线程分配
 wins = [0,0,0,0]
