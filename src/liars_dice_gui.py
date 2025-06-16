@@ -201,26 +201,26 @@ class LiarsDiceGUI:
         doubao_entry.pack(pady=5, fill="x")
         doubao_entry.insert(0, config.get("DOUBAO_API_KEY", ""))
 
-        # Google API Key
-        google_frame = tk.Frame(api_window, bg="#2c3e50")
-        google_frame.pack(pady=10, padx=20, fill='x')
+        # gemini API Key
+        gemini_frame = tk.Frame(api_window, bg="#2c3e50")
+        gemini_frame.pack(pady=10, padx=20, fill='x')
 
         tk.Label(
-            google_frame,
-            text="Google API Key:",
+            gemini_frame,
+            text="Gemini API Key:",
             font=("Heiti", 12),
             fg="#ecf0f1",
             bg="#2c3e50"
         ).pack(anchor="w")
 
-        google_entry = tk.Entry(
-            google_frame,
+        gemini_entry = tk.Entry(
+            gemini_frame,
             font=("Heiti", 11),
             width=50,
             show="*"
         )
-        google_entry.pack(pady=5, fill="x")
-        google_entry.insert(0, config.get("GOOGLE_API_KEY", ""))
+        gemini_entry.pack(pady=5, fill="x")
+        gemini_entry.insert(0, config.get("GEMINI_API_KEY", ""))
 
         # 按钮框架
         button_frame = tk.Frame(api_window, bg="#2c3e50")
@@ -230,7 +230,7 @@ class LiarsDiceGUI:
             config = {
                 "DEEPSEEK_API_KEY": deepseek_entry.get().strip(),
                 "DOUBAO_API_KEY": doubao_entry.get().strip(),
-                "GOOGLE_API_KEY": google_entry.get().strip()
+                "gemini_API_KEY": gemini_entry.get().strip()
             }
 
             # 确保config目录存在

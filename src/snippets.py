@@ -11,7 +11,7 @@ model_to_key_name = {
     "deepseek-reasoner": "DEEPSEEK_API_KEY",
     "doubao-1-5-lite-32k-250115": "DOUBAO_API_KEY",
     "doubao-1-5-thinking-pro-250415": "DOUBAO_API_KEY",
-    "gemini-2.5-flash-preview-05-20": "GOOGLE_API_KEY"
+    "gemini-2.5-flash-preview-05-20": "GEMINI_API_KEY"
 }
 
 model_to_url = {
