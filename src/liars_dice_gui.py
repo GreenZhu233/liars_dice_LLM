@@ -11,7 +11,9 @@ class LiarsDiceGUI:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Liar's Dice Game")
-        self.root.geometry("1600x900")
+        self.root.iconbitmap("images/diceicon.ico")
+        maxwide, maxheight = self.root.maxsize()
+        self.root.geometry(f"{int(maxwide*0.9)}x{int(maxheight*0.9)}+{int(maxwide*0.05)}+{int(maxheight*0.05)}")
         self.root.configure(bg="#2c3e50")
 
         # 游戏状态
@@ -96,7 +98,7 @@ class LiarsDiceGUI:
         # API设置按钮
         api_button = tk.Button(
             self.root,
-            text="设置API Keys",
+            text="API Keys",
             command=self.show_api_settings,
             font=("Heiti", 12),
             bg="#3498db",
@@ -106,12 +108,12 @@ class LiarsDiceGUI:
             relief="flat",
             cursor="hand2"
         )
-        api_button.pack(pady=20)
+        api_button.pack(pady=15)
 
-        # 角色设置按钮
+        # 角色配置按钮
         role_button = tk.Button(
             self.root,
-            text="角色设置",
+            text="角色配置",
             command=self.show_role_settings,
             font=("Heiti", 12),
             bg="#9b59b6",
@@ -121,22 +123,22 @@ class LiarsDiceGUI:
             relief="flat",
             cursor="hand2"
         )
-        role_button.pack(pady=10)
+        role_button.pack(pady=15)
 
         # 开始游戏按钮
         start_button = tk.Button(
             self.root,
             text="开始游戏",
             command=self.start_game,
-            font=("Heiti", 14, "bold"),
+            font=("Heiti", 14,),
             bg="#27ae60",
             fg="white",
-            padx=30,
-            pady=15,
+            padx=20,
+            pady=10,
             relief="flat",
             cursor="hand2"
         )
-        start_button.pack(pady=30)
+        start_button.pack(pady=15)
 
     def show_api_settings(self):
         """显示API设置窗口"""
@@ -269,10 +271,10 @@ class LiarsDiceGUI:
         ).pack(side="left", padx=10)
 
     def show_role_settings(self):
-        """显示角色设置窗口"""
+        """显示角色配置窗口"""
         role_window = tk.Toplevel(self.root)
-        role_window.title("角色设置")
-        role_window.geometry("650x600")
+        role_window.title("角色配置")
+        role_window.geometry("500x500")
         role_window.configure(bg="#2c3e50")
         role_window.grab_set()
 
@@ -297,7 +299,7 @@ class LiarsDiceGUI:
         canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
 
-        # 角色设置区域
+        # 角色配置区域
         role_entries = []
 
         for i, role in enumerate(self.role_config):
@@ -364,7 +366,7 @@ class LiarsDiceGUI:
 
         tk.Button(
             button_frame,
-            text="保存配置",
+            text="保存",
             command=save_roles,
             font=("Heiti", 12),
             bg="#27ae60",
@@ -373,7 +375,7 @@ class LiarsDiceGUI:
             pady=8,
             relief="flat",
             cursor="hand2"
-        ).pack(side="left", padx=10)
+        ).pack(side="top", padx=10, pady=30)
 
         tk.Button(
             button_frame,
@@ -386,7 +388,7 @@ class LiarsDiceGUI:
             pady=8,
             relief="flat",
             cursor="hand2"
-        ).pack(side="left", padx=10)
+        ).pack(side="top", padx=10, pady=30)
 
     def load_api_config(self):
         """加载API配置文件"""
@@ -402,7 +404,7 @@ class LiarsDiceGUI:
         config = self.load_api_config()
         for role in self.role_config:
             if not config.get(model_to_key_name[role["model"]]):
-                messagebox.showerror("错误", "请先配置好 API Key！")
+                messagebox.showerror("错误", f"请先配置好 API Key: {role["model"]}")
                 return
 
         # 创建游戏界面
