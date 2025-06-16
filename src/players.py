@@ -72,7 +72,7 @@ class Player():
             round_action_info: 本轮游戏中已经发生的动作记录。
             extra_hint: 额外提示信息。
 
-        Rets:
+        Returns:
             返回一个二元组，包含以下两部分：
             1. 一个字典，包含以下键值对：
                 - challenge: bool, 是否质疑上家
@@ -141,6 +141,11 @@ class Player():
                         # 验证JSON格式是否符合要求
                         if all(key in result for key in ["challenge", "value", "number", "reason", "behaviour"]):
                             return result, reasoning_content
+                        else:
+                            raise Exception("json格式不符合要求")
+
+                    else:
+                        raise Exception("json提取失败")
             except Exception as e:
                 # 仅记录错误，不修改重试请求
                 print(f"尝试 {attempt+1} 解析失败: {str(e)}")
