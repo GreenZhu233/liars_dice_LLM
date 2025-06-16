@@ -6,6 +6,7 @@ import os
 from typing import List, Dict, Any
 import uuid
 import threading
+from tkinter import messagebox
 
 class LiarsDiceGame():
     def __init__(self, players: List[Player], stream_output = True, reflect_each_round = True):
@@ -74,6 +75,11 @@ class LiarsDiceGame():
         self.log_to_gui("-" * 50)
 
         # 判断合法性
+        if action['value'] < 1 or action['value'] > 6:
+            self.logger.error(f"{player.name} 叫点不合法。")
+            self.log_to_gui(f"❌ {player.name} 叫点不合法！")
+            self.extra_hint = "骰子点数只能取[1,2,3,4,5,6]中的值。"
+            return False
         if action['number'] > self.dice_number or (action['number'] == self.dice_number and action['value'] > self.dice_value):
             self.dice_number = action['number']
             self.dice_value = action['value']
@@ -258,7 +264,10 @@ class LiarsDiceGame():
                     if not next_player.is_human:
                         self.log_to_gui(f"⏳ 等待 {next_player.name} 行动...")
                 else:
-                    error_times += 1
+                    if player.is_human:
+                        messagebox.showerror("叫点不合法", self.extra_hint)
+                    else:
+                        error_times += 1
             # 处理退出逻辑
             if self.gui and (not self.is_running):
                 return
