@@ -7,7 +7,8 @@ model_list = [
     "glm-z1-flash",
     "qwq-plus",
     "qwen-max-0125",
-    "hunyuan-t1-latest"
+    "hunyuan-t1-latest",
+    "x1"
 ]
 
 model_to_key_name = {
@@ -20,6 +21,7 @@ model_to_key_name = {
     "qwq-plus": "DASHSCOPE_API_KEY",
     "qwen-max-0125": "DASHSCOPE_API_KEY",
     "hunyuan-t1-latest": "HUNYUAN_API_KEY",
+    "x1": "SPARK_API_KEY"
 }
 
 model_to_url = {
@@ -31,6 +33,7 @@ model_to_url = {
     "qwq-plus": "https://dashscope.aliyuncs.com/compatible-mode/v1",
     "qwen-max-0125": "https://dashscope.aliyuncs.com/compatible-mode/v1",
     "hunyuan-t1-latest": "https://api.hunyuan.cloud.tencent.com/v1",
+    "x1": "https://spark-api-open.xf-yun.com/v2"
 }
 
 model_to_API = {
@@ -42,5 +45,6 @@ model_to_API = {
     "glm-z1-flash": "OpenAI",
     "qwq-plus": "OpenAI",
     "qwen-max-0125": "OpenAI",
-    "hunyuan-t1-latest": "OpenAI"
+    "hunyuan-t1-latest": "OpenAI",
+    "x1": "OpenAI"
 }
