@@ -16,10 +16,10 @@ model_to_key_name = {
     "doubao-1-5-lite-32k-250115": "DOUBAO_API_KEY",
     "doubao-1-5-thinking-pro-250415": "DOUBAO_API_KEY",
     "gemini-2.5-flash-preview-05-20": "GEMINI_API_KEY",
-    "glm-z1-flash": "DEEPSEEK_API_KEY",
-    "qwq-plus": "DEEPSEEK_API_KEY",
-    "qwen-max-0125": "DEEPSEEK_API_KEY",
-    "hunyuan-t1-latest": "DEEPSEEK_API_KEY",
+    "glm-z1-flash": "ZHIPU_API_KEY",
+    "qwq-plus": "DASHSCOPE_API_KEY",
+    "qwen-max-0125": "DASHSCOPE_API_KEY",
+    "hunyuan-t1-latest": "HUNYUAN_API_KEY",
 }
 
 model_to_url = {

@@ -144,7 +144,7 @@ class LiarsDiceGUI:
         """显示API设置窗口"""
         api_window = tk.Toplevel(self.root)
         api_window.title("API Keys 设置")
-        api_window.geometry("500x400")
+        api_window.geometry("500x800")
         api_window.configure(bg="#2c3e50")
         api_window.grab_set()  # 模态窗口
 
@@ -221,6 +221,69 @@ class LiarsDiceGUI:
         )
         gemini_entry.pack(pady=5, fill="x")
         gemini_entry.insert(0, config.get("GEMINI_API_KEY", ""))
+
+        # 质谱API Key
+        zhipu_frame = tk.Frame(api_window, bg="#2c3e50")
+        zhipu_frame.pack(pady=10, padx=20, fill='x')
+
+        tk.Label(
+            zhipu_frame,
+            text="ZhiPu API Key:",
+            font=("Heiti", 12),
+            fg="#ecf0f1",
+            bg="#2c3e50"
+        ).pack(anchor="w")
+
+        zhipu_entry = tk.Entry(
+            zhipu_frame,
+            font=("Heiti", 11),
+            width=50,
+            show="*"
+        )
+        zhipu_entry.pack(pady=5, fill="x")
+        zhipu_entry.insert(0, config.get("ZHIPU_API_KEY", ""))
+
+        # 千问 API Key
+        qwen_frame = tk.Frame(api_window, bg="#2c3e50")
+        qwen_frame.pack(pady=10, padx=20, fill='x')
+
+        tk.Label(
+            qwen_frame,
+            text="DashScope API Key:",
+            font=("Heiti", 12),
+            fg="#ecf0f1",
+            bg="#2c3e50"
+        ).pack(anchor="w")
+
+        qwen_entry = tk.Entry(
+            qwen_frame,
+            font=("Heiti", 11),
+            width=50,
+            show="*"
+        )
+        qwen_entry.pack(pady=5, fill="x")
+        qwen_entry.insert(0, config.get("DASHSCOPE_API_KEY", ""))
+
+        # 混元 API Key
+        hunyuan_frame = tk.Frame(api_window, bg="#2c3e50")
+        hunyuan_frame.pack(pady=10, padx=20, fill='x')
+
+        tk.Label(
+            hunyuan_frame,
+            text="HunYuan API Key:",
+            font=("Heiti", 12),
+            fg="#ecf0f1",
+            bg="#2c3e50"
+        ).pack(anchor="w")
+
+        hunyuan_entry = tk.Entry(
+            hunyuan_frame,
+            font=("Heiti", 11),
+            width=50,
+            show="*"
+        )
+        hunyuan_entry.pack(pady=5, fill="x")
+        hunyuan_entry.insert(0, config.get("HUNYUAN_API_KEY", ""))
 
         # 按钮框架
         button_frame = tk.Frame(api_window, bg="#2c3e50")
