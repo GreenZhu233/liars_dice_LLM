@@ -186,7 +186,7 @@ class LiarsDiceGUI:
 
         tk.Label(
             doubao_frame,
-            text="Doubao API Key:",
+            text="Doubao（豆包） API Key:",
             font=("Heiti", 12),
             fg="#ecf0f1",
             bg="#2c3e50"
@@ -228,7 +228,7 @@ class LiarsDiceGUI:
 
         tk.Label(
             zhipu_frame,
-            text="ZhiPu API Key:",
+            text="ZhiPu（智谱） API Key:",
             font=("Heiti", 12),
             fg="#ecf0f1",
             bg="#2c3e50"
@@ -249,7 +249,7 @@ class LiarsDiceGUI:
 
         tk.Label(
             qwen_frame,
-            text="DashScope API Key:",
+            text="DashScope（千问） API Key:",
             font=("Heiti", 12),
             fg="#ecf0f1",
             bg="#2c3e50"
@@ -270,7 +270,7 @@ class LiarsDiceGUI:
 
         tk.Label(
             hunyuan_frame,
-            text="HunYuan API Key:",
+            text="HunYuan（混元） API Key:",
             font=("Heiti", 12),
             fg="#ecf0f1",
             bg="#2c3e50"
@@ -293,7 +293,10 @@ class LiarsDiceGUI:
             config = {
                 "DEEPSEEK_API_KEY": deepseek_entry.get().strip(),
                 "DOUBAO_API_KEY": doubao_entry.get().strip(),
-                "gemini_API_KEY": gemini_entry.get().strip()
+                "GEMINI_API_KEY": gemini_entry.get().strip(),
+                "ZHIPU_API_KEY": zhipu_entry.get().strip(),
+                "DASHSCOPE_API_KEY": qwen_entry.get().strip(),
+                "HUNYUAN_API_KEY": hunyuan_entry.get().strip()
             }
 
             # 确保config目录存在
