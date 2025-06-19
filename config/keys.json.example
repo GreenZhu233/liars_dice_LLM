@@ -4,5 +4,6 @@
   "GEMINI_API_KEY": "",
   "ZHIPU_API_KEY": "",
   "DASHSCOPE_API_KEY": "",
-  "HUNYUAN_API_KEY": ""
+  "HUNYUAN_API_KEY": "",
+  "SPARK_API_KEY": ""
 }
