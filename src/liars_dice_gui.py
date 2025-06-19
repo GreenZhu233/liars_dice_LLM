@@ -285,6 +285,48 @@ class LiarsDiceGUI:
         hunyuan_entry.pack(pady=5, fill="x")
         hunyuan_entry.insert(0, config.get("HUNYUAN_API_KEY", ""))
 
+        # 星火 API Key
+        hunyuan_frame = tk.Frame(api_window, bg="#2c3e50")
+        hunyuan_frame.pack(pady=10, padx=20, fill='x')
+
+        tk.Label(
+            hunyuan_frame,
+            text="HunYuan（混元） API Key:",
+            font=("Heiti", 12),
+            fg="#ecf0f1",
+            bg="#2c3e50"
+        ).pack(anchor="w")
+
+        hunyuan_entry = tk.Entry(
+            hunyuan_frame,
+            font=("Heiti", 11),
+            width=50,
+            show="*"
+        )
+        hunyuan_entry.pack(pady=5, fill="x")
+        hunyuan_entry.insert(0, config.get("HUNYUAN_API_KEY", ""))
+
+        # 星火 API Key
+        x1_frame = tk.Frame(api_window, bg="#2c3e50")
+        x1_frame.pack(pady=10, padx=20, fill='x')
+
+        tk.Label(
+            x1_frame,
+            text="Spark（星火） API Key:",
+            font=("Heiti", 12),
+            fg="#ecf0f1",
+            bg="#2c3e50"
+        ).pack(anchor="w")
+
+        x1_entry = tk.Entry(
+            x1_frame,
+            font=("Heiti", 11),
+            width=50,
+            show="*"
+        )
+        x1_entry.pack(pady=5, fill="x")
+        x1_entry.insert(0, config.get("SPARK_API_KEY", ""))
+
         # 按钮框架
         button_frame = tk.Frame(api_window, bg="#2c3e50")
         button_frame.pack(pady=30)
@@ -296,7 +338,8 @@ class LiarsDiceGUI:
                 "GEMINI_API_KEY": gemini_entry.get().strip(),
                 "ZHIPU_API_KEY": zhipu_entry.get().strip(),
                 "DASHSCOPE_API_KEY": qwen_entry.get().strip(),
-                "HUNYUAN_API_KEY": hunyuan_entry.get().strip()
+                "HUNYUAN_API_KEY": hunyuan_entry.get().strip(),
+                "SPARK_API_KEY": x1_entry.get().strip()
             }
 
             # 确保config目录存在
