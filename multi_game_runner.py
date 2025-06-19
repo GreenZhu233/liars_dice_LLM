@@ -7,7 +7,7 @@ import threading
 def run_game(thread_runs: int):
     for _ in range(thread_runs):
         players = [Player(name=config['name'], is_human=False, model=config['model']) for config in role_config]
-        game = LiarsDiceGame(players, stream_output=False)
+        game = LiarsDiceGame(players, console_output=False)
         winner = game.start_game()
         if winner:
             print(f"winner: {winner}\tlogfile: {game.log_path}\n", end='')
