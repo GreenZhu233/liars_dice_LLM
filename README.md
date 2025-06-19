@@ -26,7 +26,7 @@
 - template：规则等文本模板
 
 ## 安装与依赖
-1. Python >= 3.10
+1. Python >= 3.12
 2. 安装依赖：
    ```bash
    pip install -r requirements.txt

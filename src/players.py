@@ -5,6 +5,7 @@ import threading
 from src.llm_client import OpenAILLMClient, GoogleLLMClient
 from typing import List, Dict, Any
 from src.snippets import *
+from src.json_parser import *
 
 RULE_PATH = "template/rule.txt"
 ACTION_PROMPT_TEMPLATE_PATH = "template/action_prompt_template.txt"
@@ -129,23 +130,17 @@ class Player():
             {"role": "user", "content": prompt}]
 
             try:
-                if self.llm_client:
-                    content, reasoning_content = self.llm_client.chat(messages)
+                content, reasoning_content = self.llm_client.chat(messages)
 
-                    # 尝试从内容中提取JSON部分
-                    json_match = re.search(r'({[\s\S]*})', content)
-                    if json_match:
-                        json_str = json_match.group(1)
-                        result = json.loads(json_str)
+                # 尝试从响应中提取JSON
+                _, result = try_parse_json_object(content)
 
-                        # 验证JSON格式是否符合要求
-                        if all(key in result for key in ["challenge", "value", "number", "reason", "behaviour"]):
-                            return result, reasoning_content
-                        else:
-                            raise Exception("json格式不符合要求")
+                # 验证JSON格式是否符合要求
+                if all(key in result for key in ["challenge", "value", "number", "reason", "behaviour"]):
+                    return result, reasoning_content
+                else:
+                    raise Exception("json格式不符合要求")
 
-                    else:
-                        raise Exception("json提取失败")
             except Exception as e:
                 # 仅记录错误，不修改重试请求
                 print(f"尝试 {attempt+1} 解析失败: {str(e)}")
@@ -206,20 +201,16 @@ class Player():
         # 向LLM发送请求
         try:
             content, reasoning_content = self.llm_client.reflect(messages, other_players)
-            json_match = re.search(r'({[\s\S]*})', content)
-            if json_match:
-                json_str = json_match.group(1)
-                result = json.loads(json_str)
+            _, result = try_parse_json_object(content)
 
-                # 更新 opinions
-                for key, value in result.items():
-                    if key in self.opinions.keys():
-                        self.opinions[key] = value
-                    else:
-                        raise Exception(f"不存在的玩家名: {key}")
+            # 更新 opinions
+            for key, value in result.items():
+                if key in self.opinions.keys():
+                    self.opinions[key] = value
+                else:
+                    raise Exception(f"不存在的玩家名: {key}")
 
-                return True, content, reasoning_content
-            else:
-                raise Exception("json格式不匹配")
+            return True, content, reasoning_content
+
         except Exception as e:
             return False, f"{self.name} 反思过程出错: {str(e)}", ""
