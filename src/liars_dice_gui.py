@@ -362,7 +362,8 @@ class LiarsDiceGUI:
         """显示角色配置窗口"""
         role_window = tk.Toplevel(self.root)
         role_window.title("角色配置")
-        role_window.geometry("500x500")
+        role_window.geometry("450x500")
+        role_window.resizable(False, False)
         role_window.configure(bg="#2c3e50")
         role_window.grab_set()
 
@@ -374,24 +375,14 @@ class LiarsDiceGUI:
             bg="#2c3e50"
         ).pack(pady=20)
 
-        # 创建滚动框架
-        canvas = tk.Canvas(role_window, bg="#2c3e50")
-        scrollbar = ttk.Scrollbar(role_window, orient="vertical", command=canvas.yview)
-        scrollable_frame = tk.Frame(canvas, bg="#2c3e50")
-
-        scrollable_frame.bind(
-            "<Configure>",
-            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
-        )
-
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
-        canvas.configure(yscrollcommand=scrollbar.set)
 
         # 角色配置区域
+        role_frame = tk.Frame(role_window, bg="#2c3e50", width=200, height=500)
+        role_frame.pack(side="left", expand=True)
         role_entries = []
 
         for i, role in enumerate(self.role_config):
-            frame = tk.Frame(scrollable_frame, bg="#34495e", relief="solid", bd=1)
+            frame = tk.Frame(role_frame, bg="#34495e", relief="solid", bd=1)
             frame.pack(fill="x", padx=20, pady=10)
 
             tk.Label(
@@ -424,9 +415,6 @@ class LiarsDiceGUI:
                 "name": name_var,
                 "model": model_var
             })
-
-        canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
 
         # 按钮框架
         button_frame = tk.Frame(role_window, bg="#2c3e50")
