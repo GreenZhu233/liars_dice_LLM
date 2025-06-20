@@ -478,10 +478,14 @@ class LiarsDiceGUI:
         """开始游戏"""
         # 检查API keys
         config = self.load_api_config()
-        for role in self.role_config:
-            if not config.get(model_to_key_name[role["model"]]):
-                messagebox.showerror("错误", f"请先配置好 API Key: {role["model"]}")
-                return
+        try:
+            for role in self.role_config:
+                if not config.get(model_to_key_name[role["model"]]):
+                    messagebox.showerror("错误", f"请先配置好 API Key: {role["model"]}")
+                    return
+        except KeyError as e:
+            messagebox.showerror("错误", f"不支持的模型: {e}")
+            return
 
         # 创建游戏界面
         self.create_game_interface()
