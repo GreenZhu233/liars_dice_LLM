@@ -92,7 +92,7 @@ class Player():
         current_dice = ", ".join([str(dice) for dice in self.dice])
 
         # 获取对其他玩家的印象
-        opinions = "你对其他玩家的了解：\n" + '\n'.join(
+        opinions = "在之前的轮次中，你总结了对其他玩家的了解：\n" + '\n'.join(
             [f"{p.name}: {self.opinions[p.name]}" for p in active_players if p is not self]
         )
 
