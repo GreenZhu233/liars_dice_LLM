@@ -188,6 +188,8 @@ class LiarsDiceGame():
         self.log_to_gui("=" * 50)
         self.log_to_gui(round_msg)
         self.log_to_gui("=" * 50)
+        if not self.first_player.is_human:
+            self.log_to_gui(f"⏳ 等待 {self.first_player.name} 行动...")
 
         # 更新GUI玩家信息
         if self.gui and self.is_running:

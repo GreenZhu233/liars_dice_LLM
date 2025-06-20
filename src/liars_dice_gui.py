@@ -22,6 +22,7 @@ class LiarsDiceGUI:
         self.is_game_running = False
         self.human_action_event = None
         self.human_action_result = None
+        self.game_mode = tk.StringVar(value="ai_only")
 
         # 加载角色配置
         os.makedirs("config", exist_ok=True)
@@ -73,8 +74,6 @@ class LiarsDiceGUI:
             fg="#ecf0f1",
             bg="#2c3e50"
         ).pack()
-
-        self.game_mode = tk.StringVar(value="ai_only")
 
         mode_options = [
             ("4个AI对局", "ai_only"),
@@ -387,7 +386,7 @@ class LiarsDiceGUI:
 
             tk.Label(
                 frame,
-                text=f"玩家 {i+1}:(AI)" if i > 0 else "玩家 1:(AI或人类玩家)",
+                text=f"玩家 {i+1}:(AI)" if i > 0 or self.game_mode.get() == "ai_only" else "玩家 1:(人类)",
                 font=("Heiti", 12, "bold"),
                 fg="#ecf0f1",
                 bg="#34495e"
@@ -681,6 +680,9 @@ class LiarsDiceGUI:
         if hasattr(self, 'log_text'):
             try:
                 self.log_text.config(state='normal')
+                last_line = self.log_text.get("end-2l linestart", "end-2l lineend")
+                if last_line.startswith("⏳ 等待"):
+                    self.log_text.delete("end-2l linestart", "end-1 char")
                 self.log_text.insert(tk.END, message + "\n")
                 self.log_text.see(tk.END)
                 self.log_text.config(state='disabled')
@@ -816,6 +818,9 @@ class LiarsDiceGUI:
             relief="flat",
             cursor="hand2"
         ).pack(pady=20)
+
+        self.root.update()
+        self.log_text.see(tk.END)
 
     def run_game_thread(self):
         """运行游戏线程"""
