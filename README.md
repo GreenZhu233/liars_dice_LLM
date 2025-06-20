@@ -32,6 +32,25 @@
    pip install -r requirements.txt
    ```
 
+## 支持的模型
+1. deepseek
+   - deepseek-chat
+   - deepseek-reasoner（推理模型，响应速度慢）
+2. 豆包
+   - doubao-1-5-lite-32k-250115
+   - doubao-1-5-thinking-pro-250415（推理模型）
+3. Gemini
+   - gemini-2.5-flash-preview-05-20
+4. 智谱
+   - glm-z1-flash
+   - glm-z1-air（推理模型，响应速度慢）
+5. 千问
+   - qwen-max-0125
+6. 混元
+   - hunyuan-t1-latest（推理模型）
+7. 星火
+   - x1
+
 ## 快速开始
 
 ### 启动 GUI 版
@@ -51,4 +70,3 @@ python multi_game_runner.py 4 -t 2 --name1 Alice --model1 doubao-1-5-lite-32k-25
 
 ## 其他说明
 - 所有对局日志保存在 `logs` 目录。
-- deepseek-reasoner 模型的响应速度非常慢，且输出的思考内容特别长，建议不要使用这个模型。
