@@ -317,6 +317,9 @@ class LiarsDiceGame():
         self.logger.info("游戏开始")
         self.log_to_gui("🎮 欢迎来到谎言骰子游戏！")
         self.log_to_gui("📋 游戏规则：每人有5个骰子和2瓶毒药，轮流叫点或质疑，败者喝毒药")
+        for player in self.players:
+            self.logger.info(f"玩家：{player.name}，模型：{'人类' if player.is_human else player.model}")
+            self.log_to_gui(f"玩家：{player.name}，模型：{'人类' if player.is_human else player.model}")
 
         self.active_players = self.players.copy()
 
