@@ -8,12 +8,12 @@ def run_game(thread_runs: int):
     for _ in range(thread_runs):
         players = [Player(name=config['name'], is_human=False, model=config['model']) for config in role_config]
         game = LiarsDiceGame(players, console_output=False)
-        winner = game.start_game()
-        if winner:
+        try:
+            winner = game.start_game()
             print(f"winner: {winner}\tlogfile: {game.log_path}\n", end='')
             wins[player_id[winner]] += 1
-        else:
-            print(f"winner: None\tlogfile: {game.log_path}\n", end='')
+        except Exception as e:
+            print(f"{str(e)}\nlogfile: {game.log_path}\n", end='')
 
 # 设置参数
 parser = argparse.ArgumentParser()
