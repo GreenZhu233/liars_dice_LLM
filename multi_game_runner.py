@@ -3,10 +3,27 @@ from src.players import Player
 from src.snippets import *
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import logging
+import os
+import time
+
+def create_logger(id):
+    """创建日志记录器"""
+    os.makedirs('logs', exist_ok=True)
+    current_time = time.strftime("%Y%m%d-%H%M%S", time.localtime())
+    logger = logging.getLogger(f'multi_game_runner_{id}_{current_time}')
+    log_filename = f'logs/multi_game_runner_{id}_{current_time}.log'
+    logger.setLevel(logging.INFO)
+    handler = logging.FileHandler(log_filename, encoding='utf-8')
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    return logger
 
 def run_game(thread_id: int):
+    logger = create_logger(thread_id)
     players = [Player(name=config['name'], is_human=False, model=config['model']) for config in role_config]
-    game = LiarsDiceGame(players, console_output=False)
+    game = LiarsDiceGame(players, logger=logger)
     try:
         winner = game.start_game()
         print(f"({thread_id})winner: {winner}\tlogfile: {game.log_path}\n", end='')

@@ -10,7 +10,7 @@ from tkinter import messagebox
 from src.snippets import InvalidAction
 
 class LiarsDiceGame():
-    def __init__(self, players: List[Player], console_output = True, reflect_each_round = True):
+    def __init__(self, players: List[Player], reflect_each_round = True, logger: logging.Logger | None = None):
         self.players = players
         self.game_mode = 'ai_only'
         self.human_player = None
@@ -26,7 +26,7 @@ class LiarsDiceGame():
         self.first_player = self.players[random.randint(0, len(self.players) - 1)]  # 随机选择第一个玩家
         self.current_player_index = 0
         self.gui = None  # GUI引用
-        self.logger = self.create_logger(console_output)
+        self.logger = logger or self.create_logger()
         self.reflect_each_round = reflect_each_round
 
         # 轮次信息
@@ -42,7 +42,7 @@ class LiarsDiceGame():
             if player.is_human:
                 player.gui = gui
 
-    def create_logger(self, console_output):
+    def create_logger(self) -> logging.Logger:
         """创建日志记录器"""
         os.makedirs('logs', exist_ok=True)
         uuid4 = str(uuid.uuid4())
@@ -53,10 +53,9 @@ class LiarsDiceGame():
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
-        if console_output:
-            console_handler = logging.StreamHandler()
-            console_handler.setFormatter(formatter)
-            logger.addHandler(console_handler)
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(formatter)
+        logger.addHandler(console_handler)
         return logger
 
     def log_to_gui(self, message):
