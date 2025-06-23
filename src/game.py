@@ -7,6 +7,7 @@ from typing import List, Dict, Any
 import uuid
 import threading
 from tkinter import messagebox
+from src.snippets import InvalidAction
 
 class LiarsDiceGame():
     def __init__(self, players: List[Player], console_output = True, reflect_each_round = True):
@@ -219,13 +220,13 @@ class LiarsDiceGame():
         # 玩家开始行动
         self.current_player_index = self.active_players.index(self.first_player)
         is_first = True
-        error_times = 0
+        invalid_actions = 0
         self.logger.info(f"本轮从{self.first_player.name}开始")
 
         while(1):
-            if error_times >= 2:
-                self.logger.error("连续两次错误，退出程序。")
-                raise ValueError("连续两次错误，退出程序。")
+            if invalid_actions >= 2:
+                self.logger.error("连续两次叫点不合法，游戏被迫终止")
+                raise InvalidAction("连续两次叫点不合法，游戏被迫终止")
 
             # 获取玩家行动
             player = self.active_players[self.current_player_index]
@@ -269,7 +270,7 @@ class LiarsDiceGame():
                     if player.is_human:
                         messagebox.showerror("叫点不合法", self.extra_hint)
                     else:
-                        error_times += 1
+                        invalid_actions += 1
             # 处理退出逻辑
             if self.gui and (not self.is_running):
                 return

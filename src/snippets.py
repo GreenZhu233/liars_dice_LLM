@@ -48,3 +48,11 @@ model_to_API = {
     "hunyuan-t1-latest": "OpenAI",
     "x1": "OpenAI"
 }
+
+class InvalidAction(Exception):
+    def __init__(self, *args):
+        super().__init__(args)
+
+class LLMRateLimitError(Exception):
+    def __init__(self, *args):
+        super().__init__(args)

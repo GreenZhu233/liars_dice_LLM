@@ -1,5 +1,7 @@
 from openai import OpenAI
+from openai import RateLimitError
 from google import genai
+import google.api_core.exceptions
 import json
 from src.snippets import *
 from pydantic import BaseModel, create_model, Field
@@ -46,9 +48,8 @@ class OpenAILLMClient:
 
             return "", ""
 
-        except Exception as e:
-            print(f"LLM调用出错: {str(e)}")
-            return "", ""
+        except RateLimitError as e:
+            raise LLMRateLimitError(str(e))
 
     def reflect(self, messages, *args):
         response = self.client.chat.completions.create(
@@ -113,9 +114,9 @@ class GoogleLLMClient:
 
             return "", ""
 
-        except Exception as e:
-            print(f"LLM调用出错: {str(e)}")
-            return "", ""
+        except google.api_core.exceptions.ResourceExhausted as e:
+            raise LLMRateLimitError(str(e))
+
 
     def reflect(self, messages, other_players):
 

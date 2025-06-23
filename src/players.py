@@ -1,6 +1,5 @@
 import random
-import re
-import json
+import time
 import threading
 from src.llm_client import OpenAILLMClient, GoogleLLMClient
 from typing import List, Dict, Any
@@ -123,8 +122,9 @@ class Player():
                 extra_hint = extra_hint,
             )
 
-        # 尝试获取有效的JSON响应。最多重复两次
-        for attempt in range(2):
+        # 尝试获取有效的JSON响应
+        max_retries = 4
+        for attempt in range(max_retries):
             # 每次都发送相同的原始prompt
             messages = [{"role": "system", "content": rules},
             {"role": "user", "content": prompt}]
@@ -140,6 +140,10 @@ class Player():
                     return result, reasoning_content
                 else:
                     raise Exception("json格式不符合要求")
+
+            except LLMRateLimitError:
+                if attempt + 1 < max_retries:
+                    time.sleep(2 ** (attempt + 1))  # 指数退避重试
 
             except Exception as e:
                 # 仅记录错误，不修改重试请求
