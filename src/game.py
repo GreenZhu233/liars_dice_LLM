@@ -227,12 +227,9 @@ class LiarsDiceGame():
                 self.logger.error("连续两次叫点不合法，游戏被迫终止")
                 raise InvalidAction("连续两次叫点不合法，游戏被迫终止")
 
+            invalid_actions = 0
             # 获取玩家行动
             player = self.active_players[self.current_player_index]
-
-            # 等待一下，让界面更新
-            if self.gui:
-                time.sleep(0.5)
 
             if not player.is_human:
                 action, reasoning = player.get_ai_action(
@@ -307,7 +304,6 @@ class LiarsDiceGame():
             thread = threading.Thread(target=reflect_thread, daemon=True, args=(player, other_players))
             threads.append(thread)
             thread.start()
-            time.sleep(1)
 
         # 等待线程执行完毕
         for thread in threads:
