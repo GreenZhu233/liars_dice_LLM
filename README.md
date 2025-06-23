@@ -64,7 +64,7 @@ python multi_game_runner.py <总对局数> -t [线程数] [玩家参数]
 ```
 示例：
 ```bash
-python multi_game_runner.py 4 -t 2 --name1 Alice --model1 doubao-1-5-lite-32k-250115 --name2 Bob --model2 deepseek-chat --name3 Charlie --model3 doubao-1-5-lite-32k-250115 --name4 David --model4 gemini-2.5-flash-preview-05-20
+python multi_game_runner.py 10 -t 1 --name1 doubao --model1 doubao-1-5-lite-32k-250115 --name2 deepseek --model2 deepseek-chat --name3 gemini --model3 gemini-2.5-flash-preview-05-20 --name4 qwen --model4 qwen-max-0125
 ```
 在启动批量自动对战前，请确保需要的模型API秘钥已在 `config/keys.json` 中配置完成。
 
