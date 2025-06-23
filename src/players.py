@@ -1,6 +1,7 @@
 import random
 import time
 import threading
+import logging
 from src.llm_client import OpenAILLMClient, GoogleLLMClient
 from typing import List, Dict, Any
 from src.snippets import *
@@ -12,13 +13,14 @@ FIRST_PLAYER_ACTION_PROMPT_TEMPLATE_PATH = "template/first_player_action_prompt_
 REFLECT_PROMPT_TEMPLATE_PATH = "template/reflect_prompt_template.txt"
 
 class Player():
-    def __init__(self, name = "", is_human = False, model: str = ""):
+    def __init__(self, name = "", is_human = False, model: str = "", logger: logging.Logger | None = None):
         """
         初始化玩家属性
             name: 玩家名称
             is_human: 是否为人类玩家
             model: AI模型，如"deepseek-chat"
         """
+        self.logger = logger
         self.name = name
         self.is_human = is_human
         self.model = model
@@ -60,7 +62,8 @@ class Player():
             with open(filepath, 'r', encoding='utf-8') as f:
                 return f.read().strip()
         except Exception as e:
-            print(f"读取文件 {filepath} 失败: {str(e)}")
+            if self.logger:
+                self.logger.error(f"读取文件 {filepath} 失败: {str(e)}")
             return ""
 
     def get_ai_action(self, is_first: bool, active_players: List["Player"], round_base_info: str, round_action_info: str, extra_hint: str = "") -> tuple[Dict[str, Any], str]:
@@ -144,11 +147,13 @@ class Player():
             except LLMRateLimitError:
                 if attempt + 1 < max_retries:
                     time.sleep(2 ** (attempt + 1))  # 指数退避重试
+                else:
+                    raise
 
             except Exception as e:
-                # 仅记录错误，不修改重试请求
-                print(f"尝试 {attempt+1} 解析失败: {str(e)}")
-        raise RuntimeError(f"玩家 {self.name} 的get_ai_action方法在多次尝试后失败")
+                if self.logger:
+                    self.logger.error(f"玩家 {self.name} 第{attempt+1}次尝试解析json失败: {str(e)}")
+        raise LLMError(f"玩家 {self.name} 的get_ai_action方法在多次尝试后失败")
 
     def get_human_action(self):
         """获取人类玩家的操作"""

@@ -53,6 +53,10 @@ class InvalidAction(Exception):
     def __init__(self, *args):
         super().__init__(args)
 
-class LLMRateLimitError(Exception):
+class LLMError(Exception):
+    def __init__(self, *args):
+        super().__init__(args)
+
+class LLMRateLimitError(LLMError):
     def __init__(self, *args):
         super().__init__(args)

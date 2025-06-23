@@ -1,5 +1,5 @@
 from openai import OpenAI
-from openai import RateLimitError
+from openai import RateLimitError, APIError
 from google import genai
 import google.api_core.exceptions
 import json
@@ -50,6 +50,17 @@ class OpenAILLMClient:
 
         except RateLimitError as e:
             raise LLMRateLimitError(str(e))
+        except APIError as e:
+            # 检查503
+            if getattr(e, 'http_status', None) == 503 or 'overloaded' in str(e).lower():
+                raise LLMRateLimitError(str(e))
+            else:
+                raise
+        except Exception as e:
+            if '503' in str(e) or 'unavailable' in str(e).lower() or 'overloaded' in str(e).lower():
+                raise LLMRateLimitError(str(e))
+            else:
+                raise
 
     def reflect(self, messages, *args):
         response = self.client.chat.completions.create(
@@ -116,6 +127,13 @@ class GoogleLLMClient:
 
         except google.api_core.exceptions.ResourceExhausted as e:
             raise LLMRateLimitError(str(e))
+        except google.api_core.exceptions.ServiceUnavailable as e:
+            raise LLMRateLimitError(str(e))
+        except Exception as e:
+            if '503' in str(e) or 'unavailable' in str(e).lower() or 'overloaded' in str(e).lower():
+                raise LLMRateLimitError(str(e))
+            else:
+                raise
 
 
     def reflect(self, messages, other_players):
