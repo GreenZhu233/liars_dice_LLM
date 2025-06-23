@@ -60,7 +60,7 @@ for p in role_config:
 wins = [0,0,0,0]
 with ThreadPoolExecutor(max_workers=threads) as executor:
     futures = [executor.submit(run_game, i) for i in range(total_runs)]
-    id = 1
+    id = 0
     try:
         for future in as_completed(futures):
             id += 1
