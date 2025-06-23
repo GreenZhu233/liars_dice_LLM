@@ -2,18 +2,18 @@ from src.game import LiarsDiceGame
 from src.players import Player
 from src.snippets import *
 import argparse
-import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
-def run_game(thread_runs: int):
-    for _ in range(thread_runs):
-        players = [Player(name=config['name'], is_human=False, model=config['model']) for config in role_config]
-        game = LiarsDiceGame(players, console_output=False)
-        try:
-            winner = game.start_game()
-            print(f"winner: {winner}\tlogfile: {game.log_path}\n", end='')
-            wins[player_id[winner]] += 1
-        except Exception as e:
-            print(f"{str(e)}\nlogfile: {game.log_path}\n", end='')
+def run_game(thread_id: int):
+    players = [Player(name=config['name'], is_human=False, model=config['model']) for config in role_config]
+    game = LiarsDiceGame(players, console_output=False)
+    try:
+        winner = game.start_game()
+        print(f"({thread_id})winner: {winner}\tlogfile: {game.log_path}\n", end='')
+        wins[player_id[winner]] += 1
+    except Exception as e:
+        print(f"{str(e)}\nlogfile: {game.log_path}\n", end='')
+        raise e
 
 # 设置参数
 parser = argparse.ArgumentParser()
@@ -56,19 +56,20 @@ for p in role_config:
 for p in role_config:
     print(p['name'], ':', p['model'])
 
-# 线程分配
+# 执行线程任务
 wins = [0,0,0,0]
-thread_runs_list = [total_runs // threads for _ in range(threads)]
-for i in range(total_runs % threads):
-    thread_runs_list[i] += 1
+with ThreadPoolExecutor(max_workers=threads) as executor:
+    futures = [executor.submit(run_game, i) for i in range(total_runs)]
+    id = 1
+    try:
+        for future in as_completed(futures):
+            id += 1
+            future.result()
+    except Exception:
+        print(f"第{id}局游戏中检测到异常，终止所有任务。")
+        executor.shutdown(cancel_futures=True)
 
-# 开始运行游戏
-thread_list = [threading.Thread(target=run_game, args=(thread_runs_list[t],), daemon=True) for t in range(threads)]
-for t in range(threads):
-    thread_list[t].start()
-for t in range(threads):
-    thread_list[t].join()
-
-print("胜利次数统计：")
+success = wins[0] + wins[1] + wins[2] + wins[3]
+print(f"成功运行{success}次游戏，胜利次数统计：")
 for i in range(4):
-    print(f'{role_config[i]['name']}: {wins[i]}')
+    print(f'{role_config[i]['name']}({role_config[i]['model']}): {wins[i]}')
