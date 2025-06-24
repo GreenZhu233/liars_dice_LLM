@@ -76,23 +76,25 @@ for p in role_config:
 # 执行线程任务
 wins = [0,0,0,0]
 start_time = time.time()
-with ThreadPoolExecutor(max_workers=threads) as executor:
-    futures = [executor.submit(run_game, i) for i in range(total_runs)]
-    id = 0
-    for future in as_completed(futures):
-        id += 1
-        try:
-            future.result()
-        except LLMError as e:
-            print(f"第{id}局游戏中检测到异常：{str(e)}。正在终止任务……")
-            executor.shutdown(cancel_futures=True)
-            break
-        except Exception as e:
-            print(f"第{id}局游戏中检测到异常：{str(e)}")
+try:
+    with ThreadPoolExecutor(max_workers=threads) as executor:
+        futures = [executor.submit(run_game, i) for i in range(total_runs)]
+        id = 0
+        for future in as_completed(futures):
+            id += 1
+            try:
+                future.result()
+            except LLMError as e:
+                print(f"第{id}局游戏中检测到异常：{str(e)}。正在终止任务……")
+                executor.shutdown(cancel_futures=True)
+                break
+            except Exception as e:
+                print(f"第{id}局游戏中检测到异常：{str(e)}")
 
-end_time = time.time()
-elapsed_time = end_time - start_time
-success = wins[0] + wins[1] + wins[2] + wins[3]
-print(f"成功运行{success}次游戏，耗时{elapsed_time}s，胜利次数统计：")
-for i in range(4):
-    print(f'{role_config[i]['name']}({role_config[i]['model']}): {wins[i]}')
+finally:
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    success = wins[0] + wins[1] + wins[2] + wins[3]
+    print(f"成功运行{success}次游戏，耗时{elapsed_time}s，胜利次数统计：")
+    for i in range(4):
+        print(f'{role_config[i]['name']}({role_config[i]['model']}): {wins[i]}')
