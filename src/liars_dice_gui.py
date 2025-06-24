@@ -7,6 +7,31 @@ from src.game import LiarsDiceGame
 from src.players import Player
 from src.snippets import *
 
+class ToolTip:
+    def __init__(self, widget, text):
+        self.widget = widget
+        self.text = text
+        self.tipwindow = None
+        widget.bind("<Enter>", self.show_tip)
+        widget.bind("<Leave>", self.hide_tip)
+
+    def show_tip(self, event=None):
+        if self.tipwindow or not self.text:
+            return
+        x, y, _, cy = self.widget.bbox("insert")
+        x = x + self.widget.winfo_rootx() + 30
+        y = y + cy + self.widget.winfo_rooty() + 10
+        self.tipwindow = tw = tk.Toplevel(self.widget)
+        tw.wm_overrideredirect(True)
+        tw.wm_geometry(f"+{x}+{y}")
+        label = tk.Label(tw, text=self.text, background="#ffffe0", relief="solid", borderwidth=1, font=("Heiti", 10))
+        label.pack(ipadx=5, ipady=2)
+
+    def hide_tip(self, event=None):
+        if self.tipwindow:
+            self.tipwindow.destroy()
+            self.tipwindow = None
+
 class LiarsDiceGUI:
     def __init__(self):
         self.root = tk.Tk()
@@ -76,12 +101,12 @@ class LiarsDiceGUI:
         ).pack()
 
         mode_options = [
-            ("4个AI对局", "ai_only"),
-            ("人类玩家 vs 3个AI", "human_vs_ai")
+            ("AI对战模式", "ai_only", "以上帝视角观察4个AI的博弈策略"),
+            ("单人挑战模式", "human_vs_ai", "参与到与3个AI的同台竞技中")
         ]
 
-        for text, value in mode_options:
-            tk.Radiobutton(
+        for text, value, tip in mode_options:
+            rb = tk.Radiobutton(
                 mode_frame,
                 text=text,
                 variable=self.game_mode,
@@ -91,8 +116,10 @@ class LiarsDiceGUI:
                 bg="#2c3e50",
                 selectcolor="#34495e",
                 activebackground="#34495e",
-                activeforeground="#ecf0f1"
-            ).pack(anchor="w", padx=20)
+                activeforeground="#ecf0f1",
+            )
+            rb.pack(anchor="w", padx=20)
+            ToolTip(rb, tip)
 
         # API设置按钮
         api_button = tk.Button(
