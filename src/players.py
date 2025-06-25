@@ -208,18 +208,26 @@ class Player():
         {"role": "user", "content": prompt}]
 
         # 向LLM发送请求
-        try:
-            content, reasoning_content = self.llm_client.reflect(messages, other_players)
-            _, result = try_parse_json_object(content)
+        max_retries = 4
+        for attempt in range(max_retries):
+            try:
+                content, reasoning_content = self.llm_client.reflect(messages, other_players)
+                _, result = try_parse_json_object(content)
 
-            # 更新 opinions
-            for key, value in result.items():
-                if key in self.opinions.keys():
-                    self.opinions[key] = value
+                # 更新 opinions
+                for key, value in result.items():
+                    if key in self.opinions.keys():
+                        self.opinions[key] = value
+
+                return True, content, reasoning_content
+
+            except LLMRateLimitError:
+                if attempt + 1 < max_retries:
+                    time.sleep(2 ** (attempt + 1))  # 指数退避重试
                 else:
-                    raise Exception(f"不存在的玩家名: {key}")
+                    raise
 
-            return True, content, reasoning_content
+            except Exception as e:
+                return False, f"{self.name} 反思过程出错: {str(e)}", ""
 
-        except Exception as e:
-            return False, f"{self.name} 反思过程出错: {str(e)}", ""
+        raise LLMError(f"玩家 {self.name} 的reflect方法在多次尝试后失败")
