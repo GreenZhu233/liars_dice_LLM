@@ -8,6 +8,7 @@ import uuid
 import threading
 from tkinter import messagebox
 from src.snippets import InvalidAction
+import asyncio
 
 class LiarsDiceGame():
     def __init__(self, players: List[Player], reflect_each_round = True, logger: logging.Logger | None = None):
@@ -271,44 +272,44 @@ class LiarsDiceGame():
             if self.gui and (not self.is_running):
                 return
 
-    def round_reflect(self):
-        """多线程处理所有AI玩家对局面的反思"""
-        logger_lock = threading.Lock()
-        def reflect_thread(subject_player: Player, other_players: List[Player]):
-            """更新观点"""
-            success, content, reasoning = subject_player.reflect(
-                other_players,
-                self.round_base_info,
-                self.round_action_info
+    async def round_reflect_async(self):
+        """协程方式处理所有AI玩家对局面的反思"""
+        async def reflect_coro(subject_player: Player, other_players: List[Player]):
+            loop = asyncio.get_event_loop()
+            # 反思操作仍为阻塞IO，需用run_in_executor
+            success, content, reasoning = await loop.run_in_executor(
+                None, subject_player.reflect, other_players, self.round_base_info, self.round_action_info
             )
-            with logger_lock:
-                if success:
-                    if reasoning:
-                        self.logger.info(f"{subject_player.name} 思考：{reasoning}")
-                    self.logger.info(f"{subject_player.name}: {content}")
-                else:
-                    self.logger.error(content)
+            if success:
+                if reasoning:
+                    self.logger.info(f"{subject_player.name} 思考：{reasoning}")
+                self.logger.info(f"{subject_player.name}: {content}")
+            else:
+                self.logger.error(content)
 
         self.logger.info("所有玩家正在进行反思……")
         self.log_to_gui("⏳ 所有玩家正在进行反思……")
 
-        # 创建线程
-        threads: List[threading.Thread] = []
+        tasks = []
         for player in self.active_players:
             if player.is_human:
                 continue
-            # 处理退出逻辑
             if not self.is_running:
                 return
             other_players = [p for p in self.active_players if p is not player]
-            thread = threading.Thread(target=reflect_thread, daemon=True, args=(player, other_players))
-            threads.append(thread)
-            thread.start()
-
-        # 等待线程执行完毕
-        for thread in threads:
-            thread.join()
+            tasks.append(reflect_coro(player, other_players))
+        if tasks:
+            await asyncio.gather(*tasks)
         self.log_to_gui("✅ 反思完毕！")
+
+    def round_reflect(self):
+        """兼容旧接口，自动调度协程"""
+        try:
+            asyncio.run(self.round_reflect_async())
+        except RuntimeError:
+            # 如果已在事件循环中（如notebook/GUI），用新任务调度
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(self.round_reflect_async())
 
     def start_game(self) -> str:
         """开始游戏"""
