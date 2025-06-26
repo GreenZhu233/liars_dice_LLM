@@ -90,3 +90,6 @@ python multi_game_runner.py 10 -t 1 --name1 doubao --model1 doubao-1-5-lite-32k-
 
 ## 其他说明
 - 所有对局日志保存在 `logs` 目录。
+
+## 引用声明（Credits）：
+本项目中部分提示词内容与代码框架参考并改编自开源项目[liars-bar-llm](https://github.com/LYiHub/liars-bar-llm)，原项目基于 Apache License 2.0 发布。感谢其贡献者的开放共享精神。
